@@ -103,5 +103,20 @@ namespace dima {
             }
             return count;
         }
+
+        /// @function `get_capacity`
+        /// @brief Returns the total capacity among all DIMA blocks
+        ///
+        /// @return `size_t` The total capacity among all DIMA blocks
+        size_t get_capacity() {
+            std::lock_guard<std::mutex> lock(blocks_mutex);
+            size_t count = 0;
+            for (auto &block : blocks) {
+                if (block != nullptr) {
+                    count += block->get_capacity();
+                }
+            }
+            return count;
+        }
     };
 } // namespace dima

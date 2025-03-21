@@ -108,5 +108,13 @@ namespace dima {
         size_t get_free_count() {
             return slots.size() - occupied_slots;
         }
+
+        /// @function `get_capacity`
+        /// @brief Returns the total capacity of this block
+        ///
+        /// @return `size_t` The total capacity of this block
+        size_t get_capacity() {
+            return slots.size();
+        }
     };
 } // namespace dima
