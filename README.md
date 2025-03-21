@@ -1,2 +1,3 @@
 # dima
-The C++ library version of Flints memory management architecture
+
+The C++ library version of Flints Deterministic Incremental Memory Architecture
