@@ -116,5 +116,17 @@ namespace dima {
         size_t get_capacity() {
             return slots.size();
         }
+
+        /// @function `apply_to_all_slots`
+        /// @brief Applies a function to all slots, if the slots have a value
+        ///
+        /// @param `func` The function to apply
+        template <typename Func> void apply_to_all_slots(Func &&func) {
+            for (auto &slot : slots) {
+                if (slot.value.has_value()) {
+                    std::forward<Func>(func)(slot.value.value());
+                }
+            }
+        }
     };
 } // namespace dima

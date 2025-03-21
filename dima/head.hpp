@@ -118,5 +118,18 @@ namespace dima {
             }
             return count;
         }
+
+        /// @function `parallel_foreach`
+        /// @brief Applies a function to all available slots in parallel
+        ///
+        /// @param `func` The function to apply
+        template <typename Func> void parallel_foreach(Func &&func) {
+#pragma omp parallel for
+            for (size_t i = 0; i < blocks.size(); i++) {
+                if (blocks.at(i) != nullptr) {
+                    blocks.at(i)->apply_to_all_slots(std::forward<Func>(func));
+                }
+            }
+        }
     };
 } // namespace dima
