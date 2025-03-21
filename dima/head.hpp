@@ -88,5 +88,20 @@ namespace dima {
             }
             return count;
         }
+
+        /// @function `get_free_count`
+        /// @brief Returns the number of all free slots
+        ///
+        /// @return `size_t` The number of free slots in all blocks
+        size_t get_free_count() {
+            std::lock_guard<std::mutex> lock(blocks_mutex);
+            size_t count = 0;
+            for (auto &block : blocks) {
+                if (block != nullptr) {
+                    count += block->get_free_count();
+                }
+            }
+            return count;
+        }
     };
 } // namespace dima

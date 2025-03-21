@@ -100,5 +100,13 @@ namespace dima {
         size_t get_allocation_count() {
             return occupied_slots;
         }
+
+        /// @function `get_free_count`
+        /// @brief Returns the number of free slots
+        ///
+        /// @return `size_t` The number of free slots in this block
+        size_t get_free_count() {
+            return slots.size() - occupied_slots;
+        }
     };
 } // namespace dima
