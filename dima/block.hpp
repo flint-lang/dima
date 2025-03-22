@@ -123,8 +123,8 @@ namespace dima {
         /// @param `func` The function to apply
         template <typename Func> void apply_to_all_slots(Func &&func) {
             for (auto &slot : slots) {
-                if (slot.value.has_value()) {
-                    std::forward<Func>(func)(slot.value.value());
+                if (slot.is_occupied()) {
+                    std::forward<Func>(func)(reinterpret_cast<T &>(slot.value));
                 }
             }
         }

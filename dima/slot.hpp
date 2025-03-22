@@ -1,7 +1,7 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
-#include <optional>
 #include <type_traits>
 
 /// @namespace `dima`
@@ -13,13 +13,24 @@ namespace dima {
     template <typename T, typename = std::enable_if_t<std::is_class_v<T>>> //
     class Slot {
       public:
+        enum SlotFlags {
+            UNUSED = 0,
+            OCCUPIED = 1,
+            ARRAY_START = 2,
+            ARRAY_MEMBER = 4,
+        };
+
+        /// @var `flags`
+        /// @brief The flags of this slot
+        uint8_t flags = UNUSED;
+
         /// @var `arc`
         /// @brief The reference counter of this slot, to track how many variables are using this slot
         size_t arc = 0;
 
         /// @var `value`
         /// @brief The value saved on this slot. As long as the reference count is > 0 this will have a value
-        std::optional<T> value;
+        typename std::aligned_storage<sizeof(T), alignof(T)>::type value;
 
         /// @var `on_free_callback`
         /// @brief The callback function which gets executed when this slot becomes empty (`arc` becomes 0)
@@ -30,14 +41,15 @@ namespace dima {
         ///
         /// @param `args` The arguments with which to create the value of type `T`
         template <typename... Args> void allocate(Args &&...args) {
-            value.emplace(std::forward<Args>(args)...);
+            new (&value) T(std::forward<Args>(args)...);
+            flags |= OCCUPIED;
             arc = 1;
         }
 
         /// @function `retain`
         /// @brief This function is called whenever a new variable gets access to this slot
         void retain() {
-            if (value.has_value()) {
+            if (is_occupied()) {
                 ++arc;
             }
         }
@@ -46,13 +58,26 @@ namespace dima {
         /// @brief This function is called whenever a variable goes out of scope or is freed in other ways. It reduces the arc and calls the
         /// callback function if this slot becomes empty to let the block this slot is in know that it has been freed
         void release() {
-            if (value.has_value() && --arc == 0) {
-                value = std::nullopt;
+            if (is_occupied() && --arc == 0) {
+                get()->~T();
+                flags = UNUSED;
                 if (on_free_callback) {
                     // Notify that this slot was freed
                     on_free_callback(this);
                 }
             }
+        }
+
+        inline bool is_occupied() const {
+            return flags != 0;
+        }
+
+        inline bool is_array_start() const {
+            return flags & ARRAY_START;
+        }
+
+        inline bool is_array_member() const {
+            return flags & ARRAY_MEMBER;
         }
 
         /// @function `get`
@@ -63,7 +88,7 @@ namespace dima {
         ///
         /// @return `T *` Returns the value saved on this slot direclty
         T *get() {
-            return &value.value();
+            return reinterpret_cast<T *>(&value);
         }
     };
 } // namespace dima
