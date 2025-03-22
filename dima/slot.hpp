@@ -7,6 +7,7 @@
 /// @namespace `dima`
 /// @brief The `dima` namespace contains all classes used for the DIMA memory management system
 namespace dima {
+    static constexpr size_t BASE_SIZE = 16;
 
     /// @class `Slot`
     /// @brief A slot inside a DIMA block, the slot is the smallest possible value of DIMA, and it only contains a value and the arc counter

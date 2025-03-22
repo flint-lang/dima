@@ -15,7 +15,7 @@ namespace dima {
 
     /// @class `Head`
     /// @brief The head structure managing all allocated blocks, with incremental growth
-    template <typename T, size_t BaseSize = 16, typename = std::enable_if_t<std::is_class_v<T>>> //
+    template <typename T, typename = std::enable_if_t<std::is_class_v<T>>> //
     class Head {
       public:
         /// @function `allocate`
@@ -41,7 +41,7 @@ namespace dima {
             }
 
             // If full, create a new block with 2x size of the last one, a new block definitely has space for a new variable
-            size_t new_size = blocks.empty() ? BaseSize : (BaseSize << blocks.size());
+            size_t new_size = blocks.empty() ? BASE_SIZE : (BASE_SIZE << blocks.size());
             blocks.emplace_back(std::make_unique<Block<T>>(new_size));
             blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
             // The now allocated slot should **always** have a value
