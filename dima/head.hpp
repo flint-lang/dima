@@ -27,16 +27,11 @@ namespace dima {
             std::lock_guard<std::mutex> lock(blocks_mutex);
             // Try to allocate in an existing block
             for (auto block_it = blocks.begin(); block_it != blocks.end(); ++block_it) {
-                if (*block_it != nullptr) {
+                if (*block_it != nullptr && block_it->get()->get_free_count() > 0) {
                     auto var = block_it->get()->allocate(std::forward<Args>(args)...);
                     if (var.has_value()) {
                         return var.value();
                     }
-                } else {
-                    size_t new_size = (BaseSize << std::distance(blocks.begin(), block_it));
-                    *block_it = std::make_unique<Block<T>>(new_size);
-                    block_it->get()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
-                    return block_it->get()->allocate(std::forward<Args>(args)...).value();
                 }
             }
 
@@ -124,7 +119,7 @@ namespace dima {
         ///
         /// @param `func` The function to apply
         template <typename Func> void parallel_foreach(Func &&func) {
-#pragma omp parallel for
+            // #pragma omp parallel for
             for (size_t i = 0; i < blocks.size(); i++) {
                 if (blocks.at(i) != nullptr) {
                     blocks.at(i)->apply_to_all_slots(std::forward<Func>(func));

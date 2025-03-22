@@ -1,8 +1,11 @@
 #pragma once
 
+#include "array.hpp"
 #include "slot.hpp"
 #include "var.hpp"
 
+#include <algorithm>
+#include <bitset>
 #include <functional>
 #include <optional>
 #include <type_traits>
@@ -21,6 +24,7 @@ namespace dima {
         Block(const size_t n) :
             slots(n),
             capacity(n) {
+            free_slots.resize(n / BASE_SIZE);
             for (auto &slot : slots) {
                 slot.on_free_callback = [this](Slot<T> *freed_slot) { this->slot_freed(freed_slot); };
             }
@@ -37,17 +41,28 @@ namespace dima {
         /// @function `find_empty_slot`
         /// @brief Finds the index of the next empty slot within this block, or nullopt if this block is full
         ///
-        /// @return `std::optional<size_t>` The index of the next empy slot within this block, nullopt if this block is full
-        std::optional<size_t> find_empty_slot() const {
-            if (occupied_slots == slots.size()) {
-                return std::nullopt;
+        /// @return `int` The index of the next empy slot within this block, -1 if this block is full
+        int find_empty_slot() const {
+            if (occupied_slots == capacity) {
+                return -1;
             }
-            for (size_t i = 0; i < slots.size(); ++i) {
-                if (!slots.at(i).value.has_value()) {
-                    return i;
+            size_t set_idx = 0;
+            for (const auto &set : free_slots) {
+                // Skip if all bits are 1 (all occupied)
+                if (set.all()) {
+                    set_idx++;
+                    continue;
                 }
+
+                // Find the first 0 bit
+                const uint64_t data = set.to_ullong();
+                uint64_t inverted = ~data;
+                // Mask off any bits beyond BASE_SIZE
+                inverted &= (1ULL << BASE_SIZE) - 1;
+                const unsigned long bit_idx = __builtin_ctzl(inverted);
+                return set_idx * BASE_SIZE + bit_idx;
             }
-            return std::nullopt;
+            return -1;
         }
 
         /// @function `allocate`
@@ -57,19 +72,25 @@ namespace dima {
         /// @param `args` The arguments with which to create the type T slot
         /// @return `std::optional<Var<T>>` A variable node to the allocated object of type `T`, nullopt if this block is full
         template <typename... Args> std::optional<Var<T>> allocate(Args &&...args) {
-            std::optional<size_t> slotIdx = find_empty_slot();
-            if (!slotIdx.has_value()) {
+            size_t idx = find_empty_slot();
+            if (idx == -1) {
                 return std::nullopt;
             }
-            slots.at(slotIdx.value()).allocate(std::forward<Args>(args)...);
+            slots[idx].allocate(std::forward<Args>(args)...);
+            free_slots[idx / BASE_SIZE][idx % BASE_SIZE] = true;
             occupied_slots++;
-            return Var<T>(&slots.at(slotIdx.value()));
+            return Var<T>(&slots[idx]);
         }
 
       private:
         /// @var `slots`
         /// @brief A list of all slots this block contains
         std::vector<Slot<T>> slots;
+
+        /// @var `slot_occupancy`
+        /// @brief A vector to track the occupancy of the slots to drastrically reduce the number of times `find_empty_slot` needs to be
+        /// called
+        std::vector<std::bitset<BASE_SIZE>> free_slots;
 
         /// @var `on_empty_callback`
         /// @brief The callback that gets executed when this block becomes empty
