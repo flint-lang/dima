@@ -42,15 +42,16 @@ namespace dima {
         /// @brief Finds the index of the next empty slot within this block, or nullopt if this block is full
         ///
         /// @return `int` The index of the next empy slot within this block, -1 if this block is full
-        int find_empty_slot() const {
+        int find_empty_slot() {
             if (occupied_slots == capacity) {
                 return -1;
             }
-            size_t set_idx = 0;
-            for (const auto &set : free_slots) {
+            const size_t free_slots_size = free_slots.size();
+            for (size_t i = last_non_full_slot; i < free_slots_size; i++) {
+                auto &set = free_slots[i];
                 // Skip if all bits are 1 (all occupied)
                 if (set.all()) {
-                    set_idx++;
+                    last_non_full_slot = i;
                     continue;
                 }
 
@@ -60,7 +61,7 @@ namespace dima {
                 // Mask off any bits beyond BASE_SIZE
                 inverted &= (1ULL << BASE_SIZE) - 1;
                 const unsigned long bit_idx = __builtin_ctzl(inverted);
-                return set_idx * BASE_SIZE + bit_idx;
+                return i * BASE_SIZE + bit_idx;
             }
             return -1;
         }
@@ -92,6 +93,11 @@ namespace dima {
         /// called
         std::vector<std::bitset<BASE_SIZE>> free_slots;
 
+        /// @var `last_non_full_slot`
+        /// @brief A simple number to cache what the last non-full slot is, all slots to the left of this index are considered full. This
+        /// variable always "points" to the first non-full bitset
+        size_t last_non_full_slot = 0;
+
         /// @var `on_empty_callback`
         /// @brief The callback that gets executed when this block becomes empty
         std::function<void(Block<T> *)> on_empty_callback;
@@ -109,6 +115,17 @@ namespace dima {
         ///
         /// @param `freed_slot` The slot which has been freed;
         void slot_freed(Slot<T> *freed_slot) {
+            // Calculate the index by finding the offset from the start of the slots vector
+            size_t idx = freed_slot - &slots[0];
+
+            // Mark the slot as free
+            const size_t free_slots_idx = idx / BASE_SIZE;
+            free_slots[free_slots_idx][idx & BASE_SIZE] = false;
+
+            // Update the index tracking variable for cache optimization
+            if (free_slots_idx < last_non_full_slot) {
+                last_non_full_slot = free_slots_idx;
+            }
             occupied_slots--;
             if (occupied_slots == 0 && on_empty_callback) {
                 // Notif that this block is now empty
