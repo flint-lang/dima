@@ -19,7 +19,8 @@ namespace dima {
 
       public:
         Block(const size_t n) :
-            slots(n) {
+            slots(n),
+            capacity(n) {
             for (auto &slot : slots) {
                 slot.on_free_callback = [this](Slot<T> *freed_slot) { this->slot_freed(freed_slot); };
             }
@@ -78,6 +79,10 @@ namespace dima {
         /// @brief The number of occupied slots within this block
         size_t occupied_slots = 0;
 
+        /// @var `capacity`
+        /// @brief The capacity of this block
+        size_t capacity = 0;
+
         /// @function `slot_freed`
         /// @brief This function gets called from a slot that has been freed
         ///
@@ -106,7 +111,7 @@ namespace dima {
         ///
         /// @return `size_t` The number of free slots in this block
         size_t get_free_count() {
-            return slots.size() - occupied_slots;
+            return capacity - occupied_slots;
         }
 
         /// @function `get_capacity`
@@ -114,7 +119,7 @@ namespace dima {
         ///
         /// @return `size_t` The total capacity of this block
         size_t get_capacity() {
-            return slots.size();
+            return capacity;
         }
 
         /// @function `apply_to_all_slots`
