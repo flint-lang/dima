@@ -74,7 +74,7 @@ void print_results_table(const std::vector<std::pair<size_t, std::tuple<duration
             format_number(count),                  //
             format_memory(std::get<3>(timings)),   //
             format_duration(std::get<0>(timings)), //
-            format_duration(std::get<0>(timings)), //
+            format_duration(std::get<1>(timings)), //
             format_duration(std::get<2>(timings))  //
         );
     }
