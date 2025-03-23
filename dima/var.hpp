@@ -77,5 +77,13 @@ namespace dima {
         size_t get_arc_count() {
             return slot->arc;
         }
+
+        /// @function `get`
+        /// @brief Returns a raw pointer to the value saved inside the DIMA slot this Var references
+        ///
+        /// @return `T *` The raw pointer to the value in the DIMA Slot
+        T *get() {
+            return slot->get();
+        }
     };
 } // namespace dima
