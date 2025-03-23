@@ -2,15 +2,13 @@
 #include "memory.hpp"
 
 #include <algorithm>
-#include <atomic>
 #include <chrono>
 #include <cmath>
-#include <iostream>
 #include <string>
 
-#include <dima/head.hpp>
+#include <dima/type.hpp>
 
-class Expression {
+class Expression : public dima::Type<Expression> {
   public:
     std::array<double, 64> values; // 512 Bytes of data
 
@@ -29,8 +27,6 @@ class Expression {
   private:
     std::string type;
 };
-
-static dima::Head<Expression> expressions;
 
 void apply_complex_operation(std::vector<dima::Var<Expression>> &variables) {
     for (auto &expr : variables) {
@@ -65,7 +61,7 @@ std::tuple<duration, duration, duration, size_t> test_n_allocations(const size_t
         std::vector<dima::Var<Expression>> variables;
         variables.reserve(n);
         for (int i = 0; i < n; i++) {
-            variables.emplace_back(expressions.allocate(std::string("expr_") + std::to_string(i)));
+            variables.emplace_back(Expression::allocate(std::string("expr_") + std::to_string(i)));
         }
         middle = std::chrono::high_resolution_clock::now();
 

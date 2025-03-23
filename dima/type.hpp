@@ -1,0 +1,59 @@
+#include "head.hpp"
+#include "var.hpp"
+#include <utility>
+
+/// @namespace `dima`
+/// @brief The `dima` namespace contains all classes used for the DIMA memory management system
+namespace dima {
+
+    /// @class `Type`
+    /// @brief A base class for all types managed by DIMA
+    template <typename T> class Type {
+      public:
+        /// @function `allocate`
+        /// @brief Creates a new variable of type `T` and saves it in one of the blocks
+        ///
+        /// @param `args` The arguments with which to create the type T slot
+        /// @return `Var<T>` A variable node to the allocated object of type `T`
+        template <typename... Args> static dima::Var<T> allocate(Args &&...args) {
+            return head.allocate(std::forward<Args>(args)...);
+        }
+
+        /// @function `get_allocation_count`
+        /// @brief Returns the number of all allocated variables of type `T`
+        ///
+        /// @return `size_t` The number of all allocated variables
+        static size_t get_allocation_count() {
+            return head.get_allocation_count();
+        }
+
+        /// @function `get_free_count`
+        /// @brief Returns the number of all free slots
+        ///
+        /// @return `size_t` The number of free slots in all blocks
+        static size_t get_free_count() {
+            return head.get_free_count();
+        }
+
+        /// @function `get_capacity`
+        /// @brief Get the total slot capacity for this type
+        ///
+        /// @return `size_t` The slot capacity of this type
+        static size_t get_capacity() {
+            return head.get_capacity();
+        }
+
+        /// @function `parallel_foreach`
+        /// @brief Applies a function to all available slots in parallel
+        ///
+        /// @param `func` The function to apply
+        template <typename Func> static void parallel_foreach(Func &&func) {
+            head.parallel_foreach(std::forward<Func>(func));
+        }
+
+      private:
+        /// @var `head`
+        /// @brief The static DIMA head instance for this type
+        static inline dima::Head<T> head;
+    };
+} // namespace dima

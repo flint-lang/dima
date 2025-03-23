@@ -24,7 +24,6 @@ namespace dima {
         /// @param `args` The arguments with which to create the type T slot
         /// @return `Var<T>` A variable node to the allocated object of type `T`
         template <typename... Args> Var<T> allocate(Args &&...args) {
-            std::lock_guard<std::mutex> lock(blocks_mutex);
             // Try to allocate in an existing block
             for (auto block_it = blocks.begin(); block_it != blocks.end(); ++block_it) {
                 if (*block_it != nullptr && block_it->get()->get_free_count() > 0) {
@@ -36,6 +35,7 @@ namespace dima {
             }
 
             // If full, create a new block with 2x size of the last one, a new block definitely has space for a new variable
+            std::lock_guard<std::mutex> lock(blocks_mutex);
             const size_t block_id = blocks.size();
             const size_t new_size = blocks.empty() ? BASE_SIZE : (BASE_SIZE << block_id);
             blocks.emplace_back(std::make_unique<Block<T>>(block_id, new_size));
@@ -99,7 +99,6 @@ namespace dima {
         ///
         /// @return `size_t` The number of all allocated variables
         size_t get_allocation_count() {
-            std::lock_guard<std::mutex> lock(blocks_mutex);
             size_t count = 0;
             for (auto &block : blocks) {
                 if (block != nullptr) {
@@ -114,7 +113,6 @@ namespace dima {
         ///
         /// @return `size_t` The number of free slots in all blocks
         size_t get_free_count() {
-            std::lock_guard<std::mutex> lock(blocks_mutex);
             size_t count = 0;
             for (auto &block : blocks) {
                 if (block != nullptr) {
@@ -129,7 +127,6 @@ namespace dima {
         ///
         /// @return `size_t` The total capacity among all DIMA blocks
         size_t get_capacity() {
-            std::lock_guard<std::mutex> lock(blocks_mutex);
             size_t count = 0;
             for (auto &block : blocks) {
                 if (block != nullptr) {
