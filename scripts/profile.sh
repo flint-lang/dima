@@ -19,7 +19,7 @@ root="$(cd "$(dirname "$0")" && cd .. && pwd)"
 [ ! -x "$(command -v stackcollapse-perf.pl)" ] && err_exit 1 "'stackcollapse-perf.pl' is not installed on your system! You can install it with your package manager (e.g. sudo apt install -y perf)"
 
 # Make sure that the executable (main) exists in the "$root/" directory
-[ ! -x "$root/main" ] && err_exit 1 "Executable 'main' not found in '$root/' directory!"
+[ ! -x "$root/out/dima" ] && err_exit 1 "Executable 'dima' not found in '$root/out/' directory!"
 
 # Make sure that cli arguments are given
 # [ "$#" -eq 0 ] && err_exit 1 "No cli arguments given!"
@@ -32,7 +32,7 @@ echo "-- Starting Profiling"
 
 # Collect performance data with perf and forward all cli arguments of this script
 # shellcheck disable=SC2068 # We want to forward all arguments
-sudo perf record --call-graph dwarf --all-user -F 9999 -g -o "$root/scripts/profiling/perf.data" "$root/main" $@
+sudo perf record --call-graph dwarf --all-user -F 9999 -g -o "$root/scripts/profiling/perf.data" "$root/out/dima" $@
 
 # Generate the svg file
 sudo perf script -i "$root/scripts/profiling/perf.data" | stackcollapse-perf.pl | flamegraph.pl > "$root/scripts/profiling/out.svg"
