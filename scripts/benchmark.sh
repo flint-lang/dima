@@ -10,7 +10,7 @@ benchmark() {
     echo "-- Benchmarking '$1'..."
     mkdir -p ./test/results/test_outputs
     touch ./test/results/test_outputs/"$1".txt
-    ./out/"$1" | tee ./test/results/test_outputs/"$1".txt
+    time ./out/"$1" | tee ./test/results/test_outputs/"$1".txt
 }
 
 benchmark "dima"
