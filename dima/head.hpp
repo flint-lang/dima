@@ -36,8 +36,9 @@ namespace dima {
             }
 
             // If full, create a new block with 2x size of the last one, a new block definitely has space for a new variable
-            size_t new_size = blocks.empty() ? BASE_SIZE : (BASE_SIZE << blocks.size());
-            blocks.emplace_back(std::make_unique<Block<T>>(new_size));
+            const size_t block_id = blocks.size();
+            const size_t new_size = blocks.empty() ? BASE_SIZE : (BASE_SIZE << block_id);
+            blocks.emplace_back(std::make_unique<Block<T>>(block_id, new_size));
             blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
             // The now allocated slot should **always** have a value
             return blocks.back()->allocate(std::forward<Args>(args)...).value();
@@ -58,10 +59,34 @@ namespace dima {
         /// @param `empty_block` The block which got emptied
         void block_emptied(Block<T> *empty_block) {
             std::lock_guard<std::mutex> lock(blocks_mutex);
-            for (size_t i = 0; i < blocks.size(); i++) {
-                if (blocks.at(i).get() == empty_block) {
-                    blocks.at(i).reset();
-                    break;
+            size_t idx = empty_block->get_id();
+
+            // Free the block
+            blocks[idx].reset();
+
+            // Remove all empty big blocks bigger than this block from the list
+            for (size_t i = blocks.size() - 1; i > idx; i--) {
+                if (blocks[i] == nullptr) {
+                    blocks.resize(i); // Truncate the vector
+                } else {
+                    break; // Stop at first non-empty block
+                }
+            }
+
+            // If only the first block remains and it's empty, clear everything
+            if (blocks.size() == 1 && blocks[0] == nullptr) {
+                blocks.clear();
+            } else {
+                // Or, if all blocks are empty, clear everything
+                bool every_block_null = true;
+                for (const auto &block : blocks) {
+                    if (block != nullptr) {
+                        every_block_null = false;
+                        break;
+                    }
+                }
+                if (every_block_null) {
+                    blocks.clear();
                 }
             }
         }

@@ -21,7 +21,8 @@ namespace dima {
     class Block {
 
       public:
-        Block(const size_t n) :
+        Block(const size_t block_id, const size_t n) :
+            block_id(block_id),
             slots(n),
             capacity(n) {
             free_slots.resize(n / BASE_SIZE);
@@ -83,7 +84,18 @@ namespace dima {
             return Var<T>(&slots[idx]);
         }
 
+        /// @function `get_id`
+        /// @brief Returns the id of this block
+        ///
+        /// @return `size_t` The id of this block
+        size_t get_id() {
+            return block_id;
+        }
       private:
+        /// @var `block_id`
+        /// @brief The id of this block. Is also equal to the index of this block in the blocks vector
+        size_t block_id;
+
         /// @var `slots`
         /// @brief A list of all slots this block contains
         std::vector<Slot<T>> slots;
