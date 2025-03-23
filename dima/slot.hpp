@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <type_traits>
@@ -27,7 +28,7 @@ namespace dima {
 
         /// @var `arc`
         /// @brief The reference counter of this slot, to track how many variables are using this slot
-        size_t arc = 0;
+        std::atomic<size_t> arc = {0};
 
         /// @var `value`
         /// @brief The value saved on this slot. As long as the reference count is > 0 this will have a value
@@ -69,14 +70,26 @@ namespace dima {
             }
         }
 
+        /// @function `is_occupied`
+        /// @brief Checks whether this slot is occupied with any value
+        ///
+        /// @return `bool` Whether this slot is occupied with any value
         inline bool is_occupied() const {
             return flags != 0;
         }
 
+        /// @function `is_array_start`
+        /// @brief Checks whether this slot is the start of an array
+        ///
+        /// @return `bool` Whether this slot is the start of an array
         inline bool is_array_start() const {
             return flags & ARRAY_START;
         }
 
+        /// @function `is_array_member`
+        /// @brief Checks whether this slot is a member of an array
+        ///
+        /// @return `bool` Whether this slot is a member of an array
         inline bool is_array_member() const {
             return flags & ARRAY_MEMBER;
         }

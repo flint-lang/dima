@@ -11,6 +11,12 @@ namespace dima {
     /// @class `Var`
     /// @brief A variable reference to an element saved within a DimaSlot. When this vaiable access goes out of scope (RAII-based), the ARC
     /// counter of said DIMA slot will be reduced
+    ///
+    /// @attention
+    /// THREAD SAFETY:
+    /// - The reference counting mechanism is thread-safe
+    /// - Access to the referenced object is NOT thread-safe
+    /// - Users must provide their own synchronization when accessing the object from multiple threads
     template <typename T, typename = std::enable_if_t<std::is_class_v<T>>> //
     class Var {
       public:
