@@ -1,4 +1,5 @@
 -I./
+-Itest/include
 -std=c++17
 //-fno-exceptions
 -funwind-tables
