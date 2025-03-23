@@ -25,9 +25,13 @@ namespace dima {
         /// @return `Var<T>` A variable node to the allocated object of type `T`
         template <typename... Args> Var<T> allocate(Args &&...args) {
             // Try to allocate in an existing block
-            for (auto block_it = blocks.begin(); block_it != blocks.end(); ++block_it) {
-                if (*block_it != nullptr && block_it->get()->get_free_count() > 0) {
-                    auto var = block_it->get()->allocate(std::forward<Args>(args)...);
+            for (auto &block : blocks) {
+                auto *block_ptr = block.get();
+                if (block_ptr == nullptr) {
+                    continue;
+                }
+                if (block_ptr->get_free_count() > 0) {
+                    auto var = block_ptr->allocate(std::forward<Args>(args)...);
                     if (var.has_value()) {
                         return var.value();
                     }
