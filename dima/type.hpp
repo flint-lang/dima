@@ -19,6 +19,17 @@ namespace dima {
             return head.allocate(std::forward<Args>(args)...);
         }
 
+        /// @function `reserve`
+        /// @brief Reserves enough space in the DIMA tree that at least `n` objects will fit in it. This function only creates the biggest
+        /// block in the block list, which holds at least `(n / 2) + BASE_SIZE` elements, as block creation and block filling is done from
+        /// the biggest to the smallest blocks. This reduces fragmentation over time and also improves allocation speed, as the biggest
+        /// blocks are the most unlikely to be filled up.
+        ///
+        /// @param `n` The number of objects to reserve
+        static inline void reserve(const size_t n) {
+            head.reserve(n);
+        }
+
         /// @function `get_allocation_count`
         /// @brief Returns the number of all allocated variables of type `T`
         ///

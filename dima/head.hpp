@@ -59,6 +59,27 @@ namespace dima {
             return blocks.back()->allocate(std::forward<Args>(args)...).value();
         }
 
+        /// @function `reserve`
+        /// @brief Reserves enough space in the DIMA tree that at least `n` objects will fit in it. This function only creates the biggest
+        /// block in the block list, which holds at least `(n / 2) + BASE_SIZE` elements, as block creation and block filling is done from
+        /// the biggest to the smallest blocks. This reduces fragmentation over time and also improves allocation speed, as the biggest
+        /// blocks are the most unlikely to be filled up.
+        ///
+        /// @param `n` The number of objects to reserve
+        void reserve(const size_t n) {
+            std::lock_guard<std::mutex> lock(blocks_mutex);
+            size_t block_index = 0;
+            while (BASE_SIZE << block_index < n / 2 + BASE_SIZE) {
+                if (blocks.size() == block_index) {
+                    // Create empty blocks in the blocks vector which do not point to any real block
+                    blocks.push_back(nullptr);
+                }
+                block_index++;
+            }
+            blocks.emplace_back(std::make_unique<Block<T>>(block_index, BASE_SIZE << block_index));
+            blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+        }
+
       private:
         /// @var `blocks`
         /// @brief A list of all currently active blocks
