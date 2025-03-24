@@ -15,7 +15,7 @@ namespace dima {
         ///
         /// @param `args` The arguments with which to create the type T slot
         /// @return `Var<T>` A variable node to the allocated object of type `T`
-        template <typename... Args> static dima::Var<T> allocate(Args &&...args) {
+        template <typename... Args> static inline dima::Var<T> allocate(Args &&...args) {
             return head.allocate(std::forward<Args>(args)...);
         }
 
@@ -23,7 +23,7 @@ namespace dima {
         /// @brief Returns the number of all allocated variables of type `T`
         ///
         /// @return `size_t` The number of all allocated variables
-        static size_t get_allocation_count() {
+        static inline size_t get_allocation_count() {
             return head.get_allocation_count();
         }
 
@@ -31,7 +31,7 @@ namespace dima {
         /// @brief Returns the number of all free slots
         ///
         /// @return `size_t` The number of free slots in all blocks
-        static size_t get_free_count() {
+        static inline size_t get_free_count() {
             return head.get_free_count();
         }
 
@@ -39,7 +39,7 @@ namespace dima {
         /// @brief Get the total slot capacity for this type
         ///
         /// @return `size_t` The slot capacity of this type
-        static size_t get_capacity() {
+        static inline size_t get_capacity() {
             return head.get_capacity();
         }
 
@@ -47,7 +47,7 @@ namespace dima {
         /// @brief Applies a function to all available slots in parallel
         ///
         /// @param `func` The function to apply
-        template <typename Func> static void parallel_foreach(Func &&func) {
+        template <typename Func> static inline void parallel_foreach(Func &&func) {
             head.parallel_foreach(std::forward<Func>(func));
         }
 
