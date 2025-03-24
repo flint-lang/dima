@@ -25,8 +25,8 @@ namespace dima {
         /// @return `Var<T>` A variable node to the allocated object of type `T`
         template <typename... Args> Var<T> allocate(Args &&...args) {
             // Try to allocate in an existing block
-            for (auto &block : blocks) {
-                auto *block_ptr = block.get();
+            for (size_t i = blocks.size(); i > 0; i--) {
+                auto *block_ptr = blocks[i - 1].get();
                 if (block_ptr == nullptr) {
                     continue;
                 }
@@ -37,9 +37,20 @@ namespace dima {
                     }
                 }
             }
-
-            // If full, create a new block with 2x size of the last one, a new block definitely has space for a new variable
+            // Apply the block mutex, as now definitely a new block will be added one way or the other
             std::lock_guard<std::mutex> lock(blocks_mutex);
+
+            // Try to cerate a block that isnt created yet in the current blocks vector
+            for (size_t i = blocks.size(); i > 0; i--) {
+                if (blocks[i - 1] != nullptr) {
+                    continue;
+                }
+                blocks[i - 1] = std::make_unique<Block<T>>(i - 1, BASE_SIZE << (i - 1));
+                blocks[i - 1]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+                return blocks[i - 1]->allocate(std::forward<Args>(args)...).value();
+            }
+
+            // If all blocks are full, create a new block with 2x size of the last one, a new block definitely has space for a new variable
             const size_t block_id = blocks.size();
             const size_t new_size = blocks.empty() ? BASE_SIZE : (BASE_SIZE << block_id);
             blocks.emplace_back(std::make_unique<Block<T>>(block_id, new_size));
