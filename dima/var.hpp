@@ -61,10 +61,10 @@ namespace dima {
 
         // This operator makes working with variables a lot easier, as the data saved inside the slot can be forwareded directly
         // These also ensure that the slot itself stays safe and cannot be modified from within this Var class by the user
-        T *operator->() {
+        inline T *operator->() {
             return slot->get();
         }
-        const T *operator->() const {
+        const inline T *operator->() const {
             return slot->get();
         }
 
@@ -80,7 +80,7 @@ namespace dima {
         /// @brief Returns the reference count the slot this variable operates on has
         ///
         /// @return `size_t` The reference count of the slot this variable operates on
-        size_t get_arc_count() {
+        inline size_t get_arc_count() {
             return slot->arc;
         }
 
@@ -88,7 +88,7 @@ namespace dima {
         /// @brief Returns a raw pointer to the value saved inside the DIMA slot this Var references
         ///
         /// @return `T *` The raw pointer to the value in the DIMA Slot
-        T *get() {
+        inline T *get() {
             return slot->get();
         }
     };

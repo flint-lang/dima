@@ -15,6 +15,10 @@ namespace dima {
     template <typename T, typename = std::enable_if_t<std::is_class_v<T>>> //
     class Slot {
       public:
+        Slot() {
+            value_ptr = reinterpret_cast<T *>(&value);
+        }
+
         enum SlotFlags {
             UNUSED = 0,
             OCCUPIED = 1,
@@ -34,6 +38,11 @@ namespace dima {
         /// @brief The value saved on this slot. As long as the reference count is > 0 this will have a value
         typename std::aligned_storage<sizeof(T), alignof(T)>::type value;
 
+        /// @var `value_ptr`
+        /// @brief This value pointer is created when the slot is created and it never changes. It only exists to make the `get` function
+        /// faster, as there does not need to happen a reinterpret_cast for every single call of `get`
+        T *value_ptr;
+
         /// @var `on_free_callback`
         /// @brief The callback function which gets executed when this slot becomes empty (`arc` becomes 0)
         std::function<void(Slot<T> *)> on_free_callback;
@@ -46,6 +55,7 @@ namespace dima {
             new (&value) T(std::forward<Args>(args)...);
             flags |= OCCUPIED;
             arc = 1;
+            // value_ptr = reinterpret_cast<T *>(&value);
         }
 
         /// @function `retain`
@@ -101,8 +111,8 @@ namespace dima {
         /// exists
         ///
         /// @return `T *` Returns the value saved on this slot direclty
-        T *get() {
-            return reinterpret_cast<T *>(&value);
+        inline T *get() {
+            return value_ptr;
         }
     };
 } // namespace dima
