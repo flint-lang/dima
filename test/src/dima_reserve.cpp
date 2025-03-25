@@ -51,10 +51,12 @@ void apply_simple_operation(std::vector<dima::Var<Expression>> &variables) {
     }
 }
 
-std::tuple<duration, duration, duration, size_t> test_n_allocations(const size_t n) {
+std::tuple<duration, duration, duration, duration, size_t> test_n_allocations(const size_t n) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto middle = start;
-    auto middle2 = start;
+    auto alloc_time = start;
+    auto simple_time = start;
+    auto complex_time = start;
+    auto dealloc_start = start;
     size_t memory_usage = 0;
     {
         // Create multiple expressions
@@ -64,24 +66,27 @@ std::tuple<duration, duration, duration, size_t> test_n_allocations(const size_t
         for (int i = 0; i < n; i++) {
             variables.emplace_back(Expression::allocate(std::string("expr_") + std::to_string(i)));
         }
-        middle = std::chrono::high_resolution_clock::now();
+        alloc_time = std::chrono::high_resolution_clock::now();
 
         // Now the operations
         apply_simple_operation(variables);
-        middle2 = std::chrono::high_resolution_clock::now();
+        simple_time = std::chrono::high_resolution_clock::now();
         apply_complex_operation(variables);
+        complex_time = std::chrono::high_resolution_clock::now();
 
         memory_usage = get_memory_usage();
+        dealloc_start = std::chrono::high_resolution_clock::now();
     }
     auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> alloc_dur = middle - start;
-    std::chrono::duration<double, std::milli> calc_simp = middle2 - middle;
-    std::chrono::duration<double, std::milli> calc_comp = end - middle2;
-    return {alloc_dur, calc_simp, calc_comp, memory_usage};
+    std::chrono::duration<double, std::milli> alloc_dur = alloc_time - start;
+    std::chrono::duration<double, std::milli> calc_simp = simple_time - alloc_time;
+    std::chrono::duration<double, std::milli> calc_comp = complex_time - simple_time;
+    std::chrono::duration<double, std::milli> dealloc_time = end - dealloc_start;
+    return {alloc_dur, calc_simp, calc_comp, dealloc_time, memory_usage};
 }
 
 int main() {
-    std::vector<std::pair<size_t, std::tuple<duration, duration, duration, size_t>>> all_results;
+    std::vector<std::pair<size_t, std::tuple<duration, duration, duration, duration, size_t>>> all_results;
 
     // Run tests with increasing object counts
     all_results.emplace_back(100, test_n_allocations(100));           // 100

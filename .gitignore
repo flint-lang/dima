@@ -1,3 +1,7 @@
 out
 .vscode
 scripts/profiling
+test/results/test_data/processed
+test/results/test_data/csv
+test/results/test_outputs
+test/create_csv

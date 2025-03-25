@@ -48,36 +48,43 @@ void print_separator(size_t width) {
 }
 
 // Print a table row with proper formatting
-void print_row(                //
-    const std::string &count,  //
-    const std::string &usage,  //
-    const std::string &alloc,  //
-    const std::string &simple, //
-    const std::string &complex //
+void print_row(                 //
+    const std::string &count,   //
+    const std::string &usage,   //
+    const std::string &alloc,   //
+    const std::string &simple,  //
+    const std::string &complex, //
+    const std::string &dealloc  //
 ) {
     const int col_width = 15;
-    std::cout << "| " << std::left << std::setw(10) << count << " | " << std::setw(col_width) << usage << " | " << std::setw(col_width)
-              << alloc << " | " << std::setw(col_width) << simple << " | " << std::setw(col_width) << complex << " |" << std::endl;
+    std::cout << "| " << std::left << std::setw(10) << count //
+              << " | " << std::setw(col_width) << usage      //
+              << " | " << std::setw(col_width) << alloc      //
+              << " | " << std::setw(col_width) << simple     //
+              << " | " << std::setw(col_width) << complex    //
+              << " | " << std::setw(col_width) << dealloc    //
+              << " |" << std::endl;
 }
 
 // Print the results in a formatted table
-void print_results_table(const std::vector<std::pair<size_t, std::tuple<duration, duration, duration, size_t>>> &results) {
+void print_results_table(const std::vector<std::pair<size_t, std::tuple<duration, duration, duration, duration, size_t>>> &results) {
     // Table header
     std::cout << "\n=== Performance Benchmarks ===\n" << std::endl;
-    print_separator(86);
-    print_row("Objects", "Memory Usage", "Allocation", "Simple Ops", "Complex Ops");
-    print_separator(86);
+    print_separator(104);
+    print_row("Objects", "Memory Usage", "Allocation", "Simple Ops", "Complex Ops", "Deallocation");
+    print_separator(104);
 
     // Table content
     for (const auto &[count, timings] : results) {
         print_row(                                 //
             format_number(count),                  //
-            format_memory(std::get<3>(timings)),   //
+            format_memory(std::get<4>(timings)),   //
             format_duration(std::get<0>(timings)), //
             format_duration(std::get<1>(timings)), //
-            format_duration(std::get<2>(timings))  //
+            format_duration(std::get<2>(timings)), //
+            format_duration(std::get<3>(timings))  //
         );
     }
 
-    print_separator(86);
+    print_separator(104);
 }

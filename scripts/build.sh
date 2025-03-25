@@ -10,6 +10,7 @@ build() {
 build dima.cpp dima
 build dima_medium.cpp dima-medium
 build dima_reserve.cpp dima-reserve
+build dima_reserve_medium.cpp dima-reserve-medium
 build std_shared.cpp std-shared
 build std_shared_medium.cpp std-shared-medium
 build std_unique.cpp std-unique

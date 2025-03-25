@@ -2,15 +2,15 @@
 #include "memory.hpp"
 
 #include <algorithm>
-#include <array>
 #include <chrono>
 #include <cmath>
-#include <memory>
-#include <vector>
+#include <string>
 
-class Expression {
+#include <dima/type.hpp>
+
+class Expression : public dima::Type<Expression> {
   public:
-    std::array<double, 8> values; // 64 Bytes of data
+    std::array<double, 8> values; // 8 Bytes of data
 
     Expression() = default;
     explicit Expression(const std::string &type) :
@@ -28,7 +28,16 @@ class Expression {
     std::string type;
 };
 
-void apply_simple_operation(std::vector<std::unique_ptr<Expression>> &variables) {
+void apply_complex_operation(std::vector<dima::Var<Expression>> &variables) {
+    for (auto &expr : variables) {
+        // Operations that use more of the object data
+        for (size_t i = 0; i < expr->values.size(); i++) {
+            expr->values[i] = std::sin(expr->values[i]) * std::cos(expr->values[i]);
+        }
+    }
+}
+
+void apply_simple_operation(std::vector<dima::Var<Expression>> &variables) {
     // Use parallel_foreach to modify all expressions
     for (auto &expr : variables) {
         // Get the current type
@@ -42,15 +51,6 @@ void apply_simple_operation(std::vector<std::unique_ptr<Expression>> &variables)
     }
 }
 
-void apply_complex_operation(std::vector<std::unique_ptr<Expression>> &variables) {
-    for (auto &expr : variables) {
-        // Operations that use more of the object data
-        for (size_t i = 0; i < expr->values.size(); i++) {
-            expr->values[i] = std::sin(expr->values[i]) * std::cos(expr->values[i]);
-        }
-    }
-}
-
 std::tuple<duration, duration, duration, duration, size_t> test_n_allocations(const size_t n) {
     auto start = std::chrono::high_resolution_clock::now();
     auto alloc_time = start;
@@ -60,10 +60,11 @@ std::tuple<duration, duration, duration, duration, size_t> test_n_allocations(co
     size_t memory_usage = 0;
     {
         // Create multiple expressions
-        std::vector<std::unique_ptr<Expression>> variables;
+        std::vector<dima::Var<Expression>> variables;
         variables.reserve(n);
+        Expression::reserve(n);
         for (int i = 0; i < n; i++) {
-            variables.emplace_back(std::make_unique<Expression>(std::string("expr_") + std::to_string(i)));
+            variables.emplace_back(Expression::allocate(std::string("expr_") + std::to_string(i)));
         }
         alloc_time = std::chrono::high_resolution_clock::now();
 
@@ -113,10 +114,6 @@ int main() {
     all_results.emplace_back(14000000, test_n_allocations(14000000)); // 14.000.000
     all_results.emplace_back(15000000, test_n_allocations(15000000)); // 15.000.000
     all_results.emplace_back(16000000, test_n_allocations(16000000)); // 16.000.000
-    all_results.emplace_back(17000000, test_n_allocations(17000000)); // 17.000.000
-    all_results.emplace_back(18000000, test_n_allocations(18000000)); // 18.000.000
-    all_results.emplace_back(19000000, test_n_allocations(19000000)); // 19.000.000
-    all_results.emplace_back(20000000, test_n_allocations(20000000)); // 20.000.000
 
     // Print formatted results
     print_results_table(all_results);
