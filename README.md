@@ -165,8 +165,8 @@ The allocation times of DIMA vs STD are very interesting. It can clearly be seen
 
 ### Simple Ops
 
-![Simple Ops](./test/results/test/data/graphs/simple-ops.png)
-![Simple Ops (Medium)](./test/results/data/graphs/simple-ops-medium.png)
+![Simple Ops](./test/results/test_data/graphs/simple-ops.png)
+![Simple Ops (Medium)](./test/results/test_data/graphs/simple-ops-medium.png)
 
 The simple operation test shows that both DIMA and STD are essentially the same curve in optimized or unoptimized modes. The simple operation thats tested is a simple string operation, so this could be the reason to why we do not see a big difference in performance, as both DIMA and STD have more indirection through `std::string` than actual differences in compute. DIMA, however, _should_ be faster, because memory is more cache-friendly allocated and packed by design. However, the test program does only allocate variables of a single type, and a lot of those, so memory fragmentation is no real concern for STD either. Perhaps in a more real-world test, where a lot of different types are allocated and accessed, we would see a bigger difference in DIMA vs STD. I would say that STD will become slower, as fragmentation increases, whereas DIMA keeps similar types close together in its blocks. But, in this test, DIMA most of times is slightly slower than STD in optimized mode.
 
