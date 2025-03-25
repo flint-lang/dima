@@ -114,6 +114,10 @@ int main() {
     all_results.emplace_back(14000000, test_n_allocations(14000000)); // 14.000.000
     all_results.emplace_back(15000000, test_n_allocations(15000000)); // 15.000.000
     all_results.emplace_back(16000000, test_n_allocations(16000000)); // 16.000.000
+    all_results.emplace_back(17000000, test_n_allocations(17000000)); // 17.000.000
+    all_results.emplace_back(18000000, test_n_allocations(18000000)); // 18.000.000
+    all_results.emplace_back(19000000, test_n_allocations(19000000)); // 19.000.000
+    all_results.emplace_back(20000000, test_n_allocations(20000000)); // 20.000.000
 
     // Print formatted results
     print_results_table(all_results);

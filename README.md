@@ -149,27 +149,38 @@ There are some benchmarks that have been made. For the benchmarks to complete yo
 
 ### Memory Usage
 
-![Memory Usage](./test/results/graph_memory_usage.png)
+![Memory Usage](./test/results/test_data/graphs/memory-usage.png)
+![Memory Usage (Medium)](./test/results/test_data/graphs/memory-usage-medium.png)
+![Memory Usage (Reserve)](./test/results/test_data/graphs/memory-usage-reserve.png)
+![Memory Usage (Reserve, Medium)](./test/results/test_data/graphs/memory-usage-reserve-medium.png)
 
 The memory usage of DIMA, as you can see, is higher than the one of C++ std (`std` tests are _always_ `std::unique_ptr` tests, alltough DIMA actually has the functionality of `std::shared_ptr`s...). The "block"-pattern of DIMAs allocation system becomes quite clear in this graph, actually, but DIMA clearly uses more memory than `std` most of times.
 
 ### Allocation Time
 
-![Allocation Time](./test/results/graph_allocation_time.png)
+![Allocation Time](./test/results/test_data/graphs/alloc.png)
+![Allocation Time (Medium)](./test/results/test_data/graphs/alloc-medium.png)
 
 The allocation times of DIMA vs STD are very interesting. It can clearly be seen that DIMA still has a lot of optimization potential. DIMA with compiler optimizations turned off is actually the slowest of all the four tests. The unoptimized and optimized STD graphs lie in between the unoptimized and optimized DIMA graphs. In the optimized DIMA graph it also can be seen that allocation times of DIMA actually stay quite horizontal as long as no new blocks are created. This means that the allocation time is directly correlated to the number of active blocks in DIMA, which can be seen by the stepping pattern that emerges. This stepping-pattern is not as pronounced in the unoptimized DIMA curve, but i would say this is because, well, its unoptimized.
 
 ### Simple Ops
 
-![Simple Ops](./test/results/graph_simple_ops.png)
+![Simple Ops](./test/results/test/data/graphs/simple-ops.png)
+![Simple Ops (Medium)](./test/results/data/graphs/simple-ops-medium.png)
 
 The simple operation test shows that both DIMA and STD are essentially the same curve in optimized or unoptimized modes. The simple operation thats tested is a simple string operation, so this could be the reason to why we do not see a big difference in performance, as both DIMA and STD have more indirection through `std::string` than actual differences in compute. DIMA, however, _should_ be faster, because memory is more cache-friendly allocated and packed by design. However, the test program does only allocate variables of a single type, and a lot of those, so memory fragmentation is no real concern for STD either. Perhaps in a more real-world test, where a lot of different types are allocated and accessed, we would see a bigger difference in DIMA vs STD. I would say that STD will become slower, as fragmentation increases, whereas DIMA keeps similar types close together in its blocks. But, in this test, DIMA most of times is slightly slower than STD in optimized mode.
 
 ### Complex Ops
 
-![Complex Ops](./test/results/graph_complex_ops.png)
+![Complex Ops](./test/results/test_data/graphs/complex-ops.png)
+![Complex Ops (Medium)](./test/results/test_data/graphs/complex-ops-medium.png)
 
 The complex ops test benefits heavily from cache locality. The unoptimized DIMA version shows its capabilities here vs the unoptimized STD version. I would assume that the differences comes from better cachability of DIMA, but i cannot really state where the difference comes from. But its very interesting to see that DIMA and STD, once again, tie on the optimized graphs. I would have expected DIMA to be faster in this case, but this complex test operates on 512 byte sized objects, with a few math operations, so i would assume that memory locality doesnt pay as much of a role here, because the objects themselves are so big. So, the added "pointer jumping" of STD seems to be neglectable for this test, as most of the time is spent on the actual calculation, hence both DIMA and STD are equally fast. There could be other factors that add to that, too, but yeah these are the tests that have been made.
+
+### Deallocation
+
+![Deallocation](./test/results/test_data/graphs/dealloc.png)
+![Deallocation](./test/results/test_data/graphs/dealloc-medium.png)
 
 ### Test Conclusion
 
