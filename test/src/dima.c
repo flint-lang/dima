@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#define DIMA_IMPLEMENTATION
 #include <dima-c/dima.h>
 
 typedef struct {

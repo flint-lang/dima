@@ -36,6 +36,46 @@ typedef struct {
 #define LIKELY(x) __builtin_expect(!!(x), 1)
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 
+// === AUTO-CLEANUP SYSTEM (RAII-LIKE) ===
+#define VAR(T, p) __attribute__((cleanup(dima_cleanup_##T))) T *p
+#define REF(T, ptr) dima_retain(&dima_head_##T, ptr)
+#define ALLOC(T, name) VAR(T, name) = (T *)dima_allocate(&dima_head_##T)
+#define VAR_VALID(T, ptr) dima_is_valid(&dima_head_##T, ptr)
+#define RELEASE(T, ptr) dima_release(&dima_head_##T, ptr)
+#define DEFER_RELEASE(T, ptr) __attribute__((cleanup(dima_defer_cleanup_##T))) T *defer_release_##ptr = ptr
+
+#define DIMA_DEFINE(T)                                                                                                                     \
+    static DimaHead dima_head_##T = {0};                                                                                                   \
+    void dima_cleanup_##T(T **ptr) {                                                                                                       \
+        dima_release(&dima_head_##T, *ptr);                                                                                                \
+    }                                                                                                                                      \
+    __attribute__((constructor)) static void dima_init_##T() {                                                                             \
+        dima_init_head(&dima_head_##T, sizeof(T));                                                                                         \
+    }                                                                                                                                      \
+    static inline void dima_defer_cleanup_##T(T **ptr) {                                                                                   \
+        if (ptr && *ptr) {                                                                                                                 \
+            RELEASE(T, *ptr);                                                                                                              \
+        }                                                                                                                                  \
+    }
+
+void dima_init_head(DimaHead *head, size_t slot_size);
+
+DimaBlock *dima_create_block(size_t slot_size, size_t capacity);
+
+void dima_free_block(DimaBlock *block);
+
+void *dima_allocate_in_block(DimaBlock *block);
+
+void *dima_allocate(DimaHead *head);
+
+void *dima_retain(DimaHead *head, void *ptr);
+
+void dima_release(DimaHead *head, void *ptr);
+
+bool dima_is_valid(DimaHead *head, void *ptr);
+
+#if defined(DIMA_IMPLEMENTATION)
+
 void dima_init_head(DimaHead *head, size_t slot_size) {
     head->slot_size = slot_size;
     head->blocks = NULL;
@@ -172,26 +212,6 @@ bool dima_is_valid(DimaHead *head, void *ptr) {
     return false;
 }
 
-// === AUTO-CLEANUP SYSTEM (RAII-LIKE) ===
-#define VAR(T, p) __attribute__((cleanup(dima_cleanup_##T))) T *p
-#define REF(T, ptr) dima_retain(&dima_head_##T, ptr)
-#define ALLOC(T, name) VAR(T, name) = dima_allocate(&dima_head_##T)
-#define VAR_VALID(T, ptr) dima_is_valid(&dima_head_##T, ptr)
-#define RELEASE(T, ptr) dima_release(&dima_head_##T, ptr)
-#define DEFER_RELEASE(T, ptr) __attribute__((cleanup(dima_defer_cleanup_##T))) T *defer_release_##ptr = ptr
-
-#define DIMA_DEFINE(T)                                                                                                                     \
-    static DimaHead dima_head_##T = {0};                                                                                                   \
-    void dima_cleanup_##T(T **ptr) {                                                                                                       \
-        dima_release(&dima_head_##T, *ptr);                                                                                                \
-    }                                                                                                                                      \
-    __attribute__((constructor)) static void dima_init_##T() {                                                                             \
-        dima_init_head(&dima_head_##T, sizeof(T));                                                                                         \
-    }                                                                                                                                      \
-    static inline void dima_defer_cleanup_##T(T **ptr) {                                                                                   \
-        if (ptr && *ptr) {                                                                                                                 \
-            RELEASE(T, *ptr);                                                                                                              \
-        }                                                                                                                                  \
-    }
+#endif // DIMA_IMPLEMENTATION
 
 #endif // DIMA_H
