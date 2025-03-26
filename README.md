@@ -147,9 +147,16 @@ to the console. With the `Var<T>` variable, you actually **never** have an ownin
 
 ### C
 
-In C, this library is quite easy to use too. Just like with C++, you first have to define your type:
+In C, this library is quite easy to use too. But before anything else, first the most important thing. In **one**, and only one, translation unit (`.c` file) in your project you should add the
 
 ```c
+#define DIMA_IMPLEMENTATION
+```
+
+definition right before including the library. So, and with this out of the way lets go through all the library features. Just like with C++, you first have to define your type:
+
+```c
+#define DIMA_IMPLEMENTATION
 #include <dima-c/dima.h>
 
 typedef struct {
