@@ -22,6 +22,7 @@ typedef struct {
     size_t slot_size;
     size_t capacity;
     size_t used;
+    size_t first_free_slot_id;
     uint8_t *slot_flags;
     uint32_t *arc_counters;
     void *slots;
@@ -109,6 +110,7 @@ DimaBlock *dima_create_block(size_t slot_size, size_t capacity) {
     block->slot_size = slot_size;
     block->capacity = capacity;
     block->used = 0;
+    block->first_free_slot_id = 0;
     return block;
 }
 
@@ -119,11 +121,12 @@ void dima_free_block(DimaBlock *block) {
 }
 
 void *dima_allocate_in_block(DimaBlock *block) {
-    for (size_t j = 0; j < block->capacity; j++) {
+    for (size_t j = block->first_free_slot_id; j < block->capacity; j++) {
         if (block->slot_flags[j] == UNUSED) { // Found free slot
             block->slot_flags[j] = OCCUPIED;  // Mark as used
             block->arc_counters[j] = 1;
             block->used++;
+            block->first_free_slot_id++;
             return (char *)block->slots + (j * block->slot_size);
         }
     }
@@ -231,6 +234,9 @@ void dima_release(DimaHead *head, void *ptr) {
             memset(ptr, 0, block->slot_size);
             block->slot_flags[index] = UNUSED;
             block->used--;
+            if (block->first_free_slot_id > index) {
+                block->first_free_slot_id = index;
+            }
             if (UNLIKELY(block->used == 0)) {
                 LC_UNLIKELY(8)
                 // Remove empty block
