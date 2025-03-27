@@ -80,6 +80,7 @@ bool dima_is_valid(DimaHead *head, void *ptr);
 
 #if defined(DIMA_IMPLEMENTATION)
 
+#ifdef LIKELYHOOD_TESTING
 #define LC(N)                                                                                                                              \
     static long likelyhood_counter_##N = 0;                                                                                                \
     static long likelyhood_sum_##N = 0;
@@ -90,6 +91,12 @@ bool dima_is_valid(DimaHead *head, void *ptr);
     likelyhood_counter_##N--;                                                                                                              \
     likelyhood_sum_##N++;
 #define LC_PRINT(N) printf("Likelyhood %d: %ld / %ld\n", N, likelyhood_counter_##N, likelyhood_sum_##N);
+#else
+#define LC(N)
+#define LC_LIKELY(N)
+#define LC_UNLIKELY(N)
+#define LC_PRINT(N)
+#endif
 
 void dima_init_head(DimaHead *head, size_t slot_size) {
     head->slot_size = slot_size;

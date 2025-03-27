@@ -5,6 +5,7 @@
 
 #define DIMA_IMPLEMENTATION
 #include <dima-c/dima.h>
+// #define LIKELYHOOD_TESTING
 
 #define VALUES_LEN 64
 #define EXPRESSION_COUNT 100000
