@@ -288,6 +288,29 @@ bool dima_is_valid(DimaHead *head, void *ptr) {
     return false;
 }
 
+void print_likelyhoods() {
+#ifndef LIKELYHOOD_TESTING
+    return;
+}
+#else
+    printf("\n");
+
+    // Print likelyhood diagnostics
+    LC_PRINT(0)
+    LC_PRINT(1)
+    LC_PRINT(2)
+    LC_PRINT(3)
+    LC_PRINT(4)
+    LC_PRINT(5)
+    LC_PRINT(6)
+    LC_PRINT(7)
+    LC_PRINT(8)
+    LC_PRINT(9)
+    LC_PRINT(10)
+    LC_PRINT(11)
+}
+#endif
+
 #endif // DIMA_IMPLEMENTATION
 
 #endif // DIMA_H
