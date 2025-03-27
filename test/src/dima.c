@@ -20,8 +20,8 @@ void apply_operation(Expression **variables, size_t len) {
     for (size_t i = 0; i < len; i++) {
         VAR(Expression, expr) = REF(Expression, variables[i]);
         for (size_t j = 0; j < VALUES_LEN; j++) {
-            double val = expr->values[j];
-            variables[i]->values[j] = sin(val) * cos(val);
+            double *val = &expr->values[j];
+            *val = sin(*val) * cos(*val);
         }
     }
 }
