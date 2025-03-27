@@ -11,7 +11,7 @@ build_cpp() {
 # $2 - binary_name
 # $3 - additional flags (for example -O1)
 build_c() {
-    clang ./test/src/"$1" -o ./out/"$2" -lc -g -I./ "$3"
+    clang ./test/src/"$1" -o ./out/"$2" -lc -lm -g -I./ "$3"
 }
 
 if [ "$1" = "c" ]; then
