@@ -178,7 +178,7 @@ LC(4)
 
 void *dima_retain(DimaHead *head, void *ptr) {
     // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
-    for (size_t i = head->block_count; i > 0; i++) {
+    for (size_t i = head->block_count; i > 0; i--) {
         DimaBlock *block = head->blocks[i - 1];
         if (UNLIKELY(block == NULL)) {
             LC_UNLIKELY(3)
