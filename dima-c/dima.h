@@ -44,13 +44,15 @@ typedef struct {
 #define RELEASE(T, ptr) dima_release(&dima_head_##T, ptr)
 #define DEFER_RELEASE(T, ptr) __attribute__((cleanup(dima_defer_cleanup_##T))) T *defer_release_##ptr = ptr
 
-#define DIMA_DEFINE(T)                                                                                                                     \
+#define DIMA_DEFINE(T, ...)                                                                                                                \
     static DimaHead dima_head_##T = {0};                                                                                                   \
+    static T dima_default_value_##T = {__VA_ARGS__};                                                                                       \
     void dima_cleanup_##T(T **ptr) {                                                                                                       \
         dima_release(&dima_head_##T, *ptr);                                                                                                \
     }                                                                                                                                      \
     __attribute__((constructor)) static void dima_init_##T() {                                                                             \
         dima_init_head(&dima_head_##T, sizeof(T));                                                                                         \
+        dima_head_##T.default_value = &dima_default_value_##T;                                                                             \
     }                                                                                                                                      \
     static inline void dima_defer_cleanup_##T(T **ptr) {                                                                                   \
         if (ptr && *ptr) {                                                                                                                 \
@@ -117,12 +119,13 @@ void *dima_allocate_in_block(DimaBlock *block) {
 }
 
 void *dima_allocate(DimaHead *head) {
+    void *slot_ptr = NULL;
     if (UNLIKELY(head->blocks == NULL)) {
         // Create the first block
         head->blocks = (DimaBlock **)calloc(1, sizeof(DimaBlock *));
         head->blocks[0] = dima_create_block(head->slot_size, DIMA_BASE_SIZE);
         head->block_count = 1;
-        return dima_allocate_in_block(head->blocks[0]);
+        slot_ptr = dima_allocate_in_block(head->blocks[0]);
     } else {
         // Try to find free slot
         for (size_t i = head->block_count; i > 0; i--) {
@@ -131,16 +134,21 @@ void *dima_allocate(DimaHead *head) {
                 continue;
             }
             // If came here, there definitely is a free slot, so allocation wont fail
-            return dima_allocate_in_block(block);
+            slot_ptr = dima_allocate_in_block(block);
         }
-        // No free slot, allocate new block
-        // First, change the blocks array and resize it
-        head->blocks = (DimaBlock **)realloc(head->blocks, (head->block_count + 1) * sizeof(DimaBlock *));
-        head->blocks[head->block_count] = dima_create_block(head->slot_size, DIMA_BASE_SIZE * head->block_count);
-        head->block_count++;
-        // There definitely will be a free slot now
-        return dima_allocate_in_block(head->blocks[head->block_count - 1]);
+        if (UNLIKELY(slot_ptr == NULL)) {
+            // No free slot, allocate new block
+            // First, change the blocks array and resize it
+            head->blocks = (DimaBlock **)realloc(head->blocks, (head->block_count + 1) * sizeof(DimaBlock *));
+            head->blocks[head->block_count] = dima_create_block(head->slot_size, DIMA_BASE_SIZE * head->block_count);
+            head->block_count++;
+            // There definitely will be a free slot now
+            slot_ptr = dima_allocate_in_block(head->blocks[head->block_count - 1]);
+        }
     }
+    // Copy the default value into the slot
+    memcpy(slot_ptr, head->default_value, head->slot_size);
+    return slot_ptr;
 }
 
 void *dima_retain(DimaHead *head, void *ptr) {

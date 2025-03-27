@@ -7,7 +7,7 @@ typedef struct {
     int x, y;
 } Point;
 
-DIMA_DEFINE(Point)
+DIMA_DEFINE(Point, 1, 2);
 
 void increment(Point *p) {
     DEFER_RELEASE(Point, p);
