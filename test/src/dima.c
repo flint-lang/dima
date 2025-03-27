@@ -7,6 +7,7 @@
 #include <dima-c/dima.h>
 
 #define VALUES_LEN 64
+#define EXPRESSION_COUNT 100000
 
 typedef struct {
     double values[VALUES_LEN];
@@ -26,16 +27,17 @@ void apply_operation(Expression **variables, size_t len) {
 
 int main() {
     struct timeval start, alloc_end, operations_end, end;
-    Expression *variables[1000000];
+    Expression *variables[EXPRESSION_COUNT];
     gettimeofday(&start, NULL);
-    for (size_t i = 0; i < 1000000; i++) {
+    for (size_t i = 0; i < EXPRESSION_COUNT; i++) {
         ALLOC(Expression, e);
         variables[i] = REF(Expression, e);
     }
     gettimeofday(&alloc_end, NULL);
-    apply_operation(variables, 1000000);
+    apply_operation(variables, EXPRESSION_COUNT);
     gettimeofday(&operations_end, NULL);
-    for (size_t i = 0; i < 1000000; i++) {
+    for (size_t i = 0; i < EXPRESSION_COUNT; i++) {
+        VAR_VALID(Expression, variables[i]);
         RELEASE(Expression, variables[i]);
     }
     gettimeofday(&end, NULL);
