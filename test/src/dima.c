@@ -50,7 +50,21 @@ int main() {
     printf("Allocation:    %.2f ms\n", alloc_time);
     printf("Operations:    %.2f ms\n", ops_time);
     printf("Deallocations: %.2f ms\n", free_time);
-    printf("Total:         %.2f ms\n", total_time);
+    printf("Total:         %.2f ms\n\n", total_time);
+
+    // Print likelyhood diagnostics
+    LC_PRINT(0)
+    LC_PRINT(1)
+    LC_PRINT(2)
+    LC_PRINT(3)
+    LC_PRINT(4)
+    LC_PRINT(5)
+    LC_PRINT(6)
+    LC_PRINT(7)
+    LC_PRINT(8)
+    LC_PRINT(9)
+    LC_PRINT(10)
+    LC_PRINT(11)
 
     return 0;
 }

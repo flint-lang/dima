@@ -78,6 +78,17 @@ bool dima_is_valid(DimaHead *head, void *ptr);
 
 #if defined(DIMA_IMPLEMENTATION)
 
+#define LC(N)                                                                                                                              \
+    static long likelyhood_counter_##N = 0;                                                                                                \
+    static long likelyhood_sum_##N = 0;
+#define LC_LIKELY(N)                                                                                                                       \
+    likelyhood_counter_##N++;                                                                                                              \
+    likelyhood_sum_##N++;
+#define LC_UNLIKELY(N)                                                                                                                     \
+    likelyhood_counter_##N--;                                                                                                              \
+    likelyhood_sum_##N++;
+#define LC_PRINT(N) printf("Likelyhood %d: %ld / %ld\n", N, likelyhood_counter_##N, likelyhood_sum_##N);
+
 void dima_init_head(DimaHead *head, size_t slot_size) {
     head->slot_size = slot_size;
     head->blocks = NULL;
@@ -118,25 +129,34 @@ void *dima_allocate_in_block(DimaBlock *block) {
     return NULL;
 }
 
+LC(0)
+LC(1)
+LC(2)
+
 void *dima_allocate(DimaHead *head) {
     void *slot_ptr = NULL;
     if (UNLIKELY(head->blocks == NULL)) {
+        LC_UNLIKELY(0)
         // Create the first block
         head->blocks = (DimaBlock **)calloc(1, sizeof(DimaBlock *));
         head->blocks[0] = dima_create_block(head->slot_size, DIMA_BASE_SIZE);
         head->block_count = 1;
         slot_ptr = dima_allocate_in_block(head->blocks[0]);
     } else {
+        LC_LIKELY(0)
         // Try to find free slot
         for (size_t i = head->block_count; i > 0; i--) {
             DimaBlock *block = head->blocks[i - 1];
-            if (UNLIKELY(block->used == block->capacity)) {
+            if (LIKELY(block->used == block->capacity)) {
+                LC_LIKELY(1)
                 continue;
             }
+            LC_UNLIKELY(1);
             // If came here, there definitely is a free slot, so allocation wont fail
             slot_ptr = dima_allocate_in_block(block);
         }
         if (UNLIKELY(slot_ptr == NULL)) {
+            LC_UNLIKELY(2)
             // No free slot, allocate new block
             // First, change the blocks array and resize it
             head->blocks = (DimaBlock **)realloc(head->blocks, (head->block_count + 1) * sizeof(DimaBlock *));
@@ -144,6 +164,8 @@ void *dima_allocate(DimaHead *head) {
             head->block_count++;
             // There definitely will be a free slot now
             slot_ptr = dima_allocate_in_block(head->blocks[head->block_count - 1]);
+        } else {
+            LC_LIKELY(2)
         }
     }
     // Copy the default value into the slot
@@ -151,71 +173,103 @@ void *dima_allocate(DimaHead *head) {
     return slot_ptr;
 }
 
+LC(3)
+LC(4)
+
 void *dima_retain(DimaHead *head, void *ptr) {
     // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
     for (size_t i = head->block_count; i > 0; i++) {
         DimaBlock *block = head->blocks[i - 1];
         if (UNLIKELY(block == NULL)) {
+            LC_UNLIKELY(3)
             continue;
         }
+        LC_LIKELY(3)
         char *start = (char *)block->slots;
         char *end = start + (block->capacity * block->slot_size);
-        if (UNLIKELY((char *)ptr >= start && (char *)ptr < end)) {
+        if (LIKELY((char *)ptr >= start && (char *)ptr < end)) {
+            LC_LIKELY(4)
             size_t index = ((char *)ptr - start) / block->slot_size;
             block->arc_counters[index]++;
             return ptr;
         }
+        LC_UNLIKELY(4)
     }
     // It should *never* get here
     printf("dima_retain failed\n");
     return NULL;
 }
 
+LC(5)
+LC(6)
+LC(7)
+LC(8)
+
 void dima_release(DimaHead *head, void *ptr) {
     // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
     for (size_t i = head->block_count; i > 0; i--) {
         DimaBlock *block = head->blocks[i - 1];
         if (UNLIKELY(block == NULL)) {
+            LC_UNLIKELY(5)
             continue;
         }
+        LC_LIKELY(5)
         char *start = (char *)block->slots;
         char *end = start + (block->capacity * block->slot_size);
         if (UNLIKELY((char *)ptr >= start && (char *)ptr < end)) {
+            LC_UNLIKELY(6)
             size_t index = ((char *)ptr - start) / block->slot_size;
+            // printf("release: %ld : %d\n", index, block->arc_counters[index]);
             block->arc_counters[index]--;
-            if (block->arc_counters[index] > 0) {
+            if (LIKELY(block->arc_counters[index] > 0)) {
+                LC_LIKELY(7)
                 return;
             }
+            LC_UNLIKELY(7)
             // Fill the slot with zeroes
             memset(ptr, 0, block->slot_size);
             block->slot_flags[index] = UNUSED;
             block->used--;
             if (UNLIKELY(block->used == 0)) {
+                LC_UNLIKELY(8)
                 // Remove empty block
                 dima_free_block(block);
                 block = NULL;
+            } else {
+                LC_LIKELY(8)
             }
             return;
         }
+        LC_LIKELY(6)
     }
 }
+
+LC(9)
+LC(10)
+LC(11)
 
 bool dima_is_valid(DimaHead *head, void *ptr) {
     // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
     if (UNLIKELY(head->blocks == NULL)) {
+        LC_UNLIKELY(9)
         return false;
     }
+    LC_LIKELY(9)
     for (size_t i = head->block_count; i > 0; i--) {
         DimaBlock *block = head->blocks[i - 1];
         if (UNLIKELY(block == NULL)) {
+            LC_UNLIKELY(10)
             continue;
         }
+        LC_LIKELY(10)
         char *start = (char *)block->slots;
         char *end = start + (block->capacity * block->slot_size);
-        if (UNLIKELY((char *)ptr >= start && (char *)ptr < end)) {
+        if (LIKELY((char *)ptr >= start && (char *)ptr < end)) {
+            LC_LIKELY(11)
             size_t index = ((char *)ptr - start) / block->slot_size;
             return block->slot_flags[index] == OCCUPIED;
         }
+        LC_UNLIKELY(11)
     }
     return false;
 }
