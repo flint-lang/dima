@@ -133,7 +133,7 @@ void *dima_allocate_in_block(DimaBlock *block) {
             block->slot_flags[j] = OCCUPIED;  // Mark as used
             block->arc_counters[j] = 1;
             block->used++;
-            block->first_free_slot_id++;
+            block->first_free_slot_id = j + 1;
             return (char *)block->slots + (j * block->slot_size);
         }
     }
