@@ -168,6 +168,7 @@ void *dima_allocate(DimaHead *head) {
             LC_UNLIKELY(1);
             // If came here, there definitely is a free slot, so allocation wont fail
             slot_ptr = dima_allocate_in_block(block);
+            break;
         }
         if (UNLIKELY(slot_ptr == NULL)) {
             LC_UNLIKELY(2)
