@@ -19,6 +19,10 @@ if [ "$1" = "c" ]; then
     build_c dima.c dima-c
     echo "--- Building 'dima-medium-c'..."
     build_c dima.c dima-medium-c "-DMEDIUM_TEST"
+    echo "--- Building 'dima-reserve-c'..."
+    build_c dima.c dima-reserve-c "-DDIMA_RESERVE"
+    echo "--- Building 'dima-reserve-medium-c'..."
+    build_c dima.c dima-reserve-medium-c "-DMEDIUM_TEST -DDIMA_RESERVE"
 
     echo "--- Building 'malloc-c'..."
     build_c dima.c malloc-c "-DRUN_MALLOC_TEST"
@@ -29,6 +33,10 @@ if [ "$1" = "c" ]; then
     build_c dima.c dima-c-o1 -O1
     echo "--- Building 'dima-medium-c-o1'..."
     build_c dima.c dima-medium-c-o1 "-DMEDIUM_TEST -O1"
+    echo "--- Building 'dima-reserve-c-o1'..."
+    build_c dima.c dima-reserve-c-o1 "-DDIMA_RESERVE -O1"
+    echo "--- Building 'dima-reserve-medium-c-o1'..."
+    build_c dima.c dima-reserve-medium-c-o1 "-DMEDIUM_TEST -DDIMA_RESERVE -O1"
 
     echo "--- Building 'malloc-c-o1'..."
     build_c dima.c malloc-c "-DRUN_MALLOC_TEST -O1"

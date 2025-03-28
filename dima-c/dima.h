@@ -42,6 +42,7 @@ typedef struct {
 #define VAR(T, p) __attribute__((cleanup(dima_cleanup_##T))) T *p
 #define REF(T, ptr) dima_retain(&dima_head_##T, ptr)
 #define ALLOC(T, name) VAR(T, name) = (T *)dima_allocate(&dima_head_##T)
+#define RESERVE(T, N) dima_reserve(&dima_head_##T, N)
 #define VAR_VALID(T, ptr) dima_is_valid(&dima_head_##T, ptr)
 #define RELEASE(T, ptr) dima_release(&dima_head_##T, ptr)
 #define DEFER_RELEASE(T, ptr) __attribute__((cleanup(dima_defer_cleanup_##T))) T *defer_release_##ptr = ptr
@@ -71,6 +72,8 @@ void dima_free_block(DimaBlock *block);
 void *dima_allocate_in_block(DimaBlock *block);
 
 void *dima_allocate(DimaHead *head);
+
+void dima_reserve(DimaHead *head, size_t n);
 
 void *dima_retain(DimaHead *head, void *ptr);
 
@@ -196,6 +199,35 @@ void *dima_allocate(DimaHead *head) {
     // Copy the default value into the slot
     memcpy(slot_ptr, head->default_value, head->slot_size);
     return slot_ptr;
+}
+void dima_reserve(DimaHead *head, size_t n) {
+    if (UNLIKELY(n <= DIMA_BASE_SIZE)) {
+        return;
+    }
+    // We need at least one block, so lets create it
+    if (UNLIKELY(head->block_count == 0)) {
+        head->blocks = (DimaBlock **)malloc(sizeof(DimaBlock *));
+        head->blocks[0] = (DimaBlock *)NULL;
+        head->block_count = 1;
+    }
+    // Start at block index 1
+    size_t block_index = 1;
+    while (dima_get_capacity(block_index) < n) {
+        // Resize the blocks array if bigger blocks are needed
+        if (head->block_count == block_index) {
+            head->blocks = (DimaBlock **)realloc(head->blocks, sizeof(DimaBlock *) * (block_index + 1));
+            head->blocks[block_index] = (DimaBlock *)NULL;
+            head->block_count++;
+        }
+        block_index++;
+    }
+    if (head->block_count > block_index) {
+        // Dont do anything, as the head already has enough space for what we need
+        return;
+    }
+    head->blocks = (DimaBlock **)realloc(head->blocks, sizeof(DimaBlock *) * (block_index + 1));
+    head->block_count++;
+    head->blocks[block_index] = dima_create_block(head->slot_size, DIMA_BASE_SIZE << block_index);
 }
 
 LC(3)

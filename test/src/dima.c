@@ -93,6 +93,9 @@ Result test_dima(const size_t n) {
     struct timeval start, alloc_end, simple_ops_end, complex_ops_end, free_end;
     Expression **variables = malloc(sizeof(Expression *) * n);
     gettimeofday(&start, NULL);
+#if defined(DIMA_RESERVE)
+    RESERVE(Expression, n);
+#endif
     for (size_t i = 0; i < n; i++) {
         ALLOC(Expression, e);
         variables[i] = REF(Expression, e);
