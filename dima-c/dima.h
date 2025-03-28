@@ -207,14 +207,6 @@ void *dima_allocate(DimaHead *head) {
     return slot_ptr;
 }
 
-size_t dima_get_max_capacity(const size_t block_id) {
-    size_t capacity = DIMA_BASE_SIZE;
-    for (size_t i = 0; i < block_id; i++) {
-        capacity += DIMA_BASE_SIZE << (i + 1);
-    }
-    return capacity;
-}
-
 void dima_reserve(DimaHead *head, size_t n) {
     if (UNLIKELY(n <= DIMA_BASE_SIZE)) {
         return;
@@ -227,7 +219,7 @@ void dima_reserve(DimaHead *head, size_t n) {
     }
     // Start at block index 1
     size_t block_index = 1;
-    while (dima_get_max_capacity(block_index) < n) {
+    while (DIMA_BASE_SIZE << block_index < n / 2 + DIMA_BASE_SIZE) {
         // Resize the blocks array if bigger blocks are needed
         if (head->block_count == block_index) {
             head->blocks = (DimaBlock **)realloc(head->blocks, sizeof(DimaBlock *) * (block_index + 1));
