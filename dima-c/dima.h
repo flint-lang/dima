@@ -158,6 +158,9 @@ void *dima_allocate(DimaHead *head) {
         // Try to find free slot
         for (size_t i = head->block_count; i > 0; i--) {
             DimaBlock *block = head->blocks[i - 1];
+            if (UNLIKELY(block == NULL)) {
+                continue;
+            }
             if (LIKELY(block->used == block->capacity)) {
                 LC_LIKELY(1)
                 continue;
