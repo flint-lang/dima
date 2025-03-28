@@ -251,7 +251,26 @@ void dima_release(DimaHead *head, void *ptr) {
                 LC_UNLIKELY(8)
                 // Remove empty block
                 dima_free_block(block);
-                block = NULL;
+                head->blocks[i - 1] = (DimaBlock *)NULL;
+                // Shrink the blocks array if the last block was freed up to the first block thats not null
+                if (UNLIKELY(i == head->block_count)) {
+                    size_t new_size = head->block_count - 1;
+                    for (; new_size > 0; new_size--) {
+                        if (head->blocks[new_size - 1] != NULL) {
+                            break;
+                        }
+                    }
+                    if (UNLIKELY(new_size == 0)) {
+                        // Completely free the blocks array if all blocks were freed
+                        head->block_count = 0;
+                        free(head->blocks);
+                        head->blocks = NULL;
+                    } else {
+                        // Otherwise, shrink the blocks array
+                        head->block_count = new_size;
+                        head->blocks = (DimaBlock **)realloc(head->blocks, new_size * sizeof(DimaBlock *));
+                    }
+                }
             } else {
                 LC_LIKELY(8)
             }
