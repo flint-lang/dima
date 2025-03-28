@@ -171,6 +171,16 @@ void *dima_allocate(DimaHead *head) {
             break;
         }
         if (UNLIKELY(slot_ptr == NULL)) {
+            // Check if an a block can be created within the blocks array
+            for (size_t i = head->block_count; i > 0; i--) {
+                if (UNLIKELY(head->blocks[i - 1] == NULL)) {
+                    head->blocks[i - 1] = dima_create_block(head->slot_size, (size_t)(DIMA_BASE_SIZE << (i - 1)));
+                    slot_ptr = dima_allocate_in_block(head->blocks[i - 1]);
+                    break;
+                }
+            }
+        }
+        if (UNLIKELY(slot_ptr == NULL)) {
             LC_UNLIKELY(2)
             // No free slot, allocate new block
             // First, change the blocks array and resize it
