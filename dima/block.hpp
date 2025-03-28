@@ -74,8 +74,8 @@ namespace dima {
         /// @param `args` The arguments with which to create the type T slot
         /// @return `std::optional<Var<T>>` A variable node to the allocated object of type `T`, nullopt if this block is full
         template <typename... Args> std::optional<Var<T>> allocate(Args &&...args) {
-            size_t idx = find_empty_slot();
-            if (idx == -1) {
+            int idx = find_empty_slot();
+            if (idx < 0) {
                 return std::nullopt;
             }
             slots[idx].allocate(std::forward<Args>(args)...);
