@@ -171,7 +171,7 @@ void *dima_allocate(DimaHead *head) {
             // No free slot, allocate new block
             // First, change the blocks array and resize it
             head->blocks = (DimaBlock **)realloc(head->blocks, (head->block_count + 1) * sizeof(DimaBlock *));
-            head->blocks[head->block_count] = dima_create_block(head->slot_size, (size_t)(DIMA_BASE_SIZE * pow(2, head->block_count + 1)));
+            head->blocks[head->block_count] = dima_create_block(head->slot_size, (size_t)(DIMA_BASE_SIZE * pow(2, head->block_count)));
             head->block_count++;
             // There definitely will be a free slot now
             slot_ptr = dima_allocate_in_block(head->blocks[head->block_count - 1]);
