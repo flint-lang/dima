@@ -15,10 +15,25 @@ build_c() {
 }
 
 if [ "$1" = "c" ]; then
-    echo "-- Building 'dima-c'..."
+    echo "--- Building 'dima-c'..."
     build_c dima.c dima-c
-    echo "-- Building 'dima-c-o1'..."
+    echo "--- Building 'dima-medium-c'..."
+    build_c dima.c dima-medium-c "-DMEDIUM_TEST"
+
+    echo "--- Building 'malloc-c'..."
+    build_c dima.c malloc-c "-DRUN_MALLOC_TEST"
+    echo "--- Building 'malloc-medium-c'..."
+    build_c dima.c malloc-medium-c "-DRUN_MALLOC_TEST -DMEDIUM_TEST"
+
+    echo "--- Building 'dima-c-o1'..."
     build_c dima.c dima-c-o1 -O1
+    echo "--- Building 'dima-medium-c-o1'..."
+    build_c dima.c dima-medium-c-o1 "-DMEDIUM_TEST -O1"
+
+    echo "--- Building 'malloc-c-o1'..."
+    build_c dima.c malloc-c "-DRUN_MALLOC_TEST -O1"
+    echo "--- Building 'malloc-medium-c-o1'..."
+    build_c dima.c malloc-medium-c "-DRUN_MALLOC_TEST -DMEDIUM_TEST -O1"
 else
     echo "-- Building 'dima'..."
     build_cpp dima.cpp dima
