@@ -222,11 +222,11 @@ LC(8)
 void dima_release(DimaHead *head, void *ptr) {
     // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
     for (size_t i = head->block_count; i > 0; i--) {
-        DimaBlock *block = head->blocks[i - 1];
-        if (UNLIKELY(block == NULL)) {
+        if (UNLIKELY(head->blocks[i - 1] == (DimaBlock *)NULL)) {
             LC_UNLIKELY(5)
             continue;
         }
+        DimaBlock *block = head->blocks[i - 1];
         LC_LIKELY(5)
         char *start = (char *)block->slots;
         char *end = start + (block->capacity * block->slot_size);
