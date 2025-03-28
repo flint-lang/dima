@@ -3,10 +3,16 @@
 # This script first converts all test output files to csv format, and then collects all data from all tests to put said data together into one single csv file
 root="$(cd "$(dirname "$0")" && cd .. && pwd)"
 
-# First, lets create all raw csv files
-for file in $(ls "$root/test/results/test_outputs"); do
-    echo "-- Converting '$root/test/results/test_outputs/$file' to csv..."
-    "$root/scripts/convert_to_csv.sh" "$root/test/results/test_outputs/$file"
+# First, lets create all raw c csv files
+for file in $(ls "$root/test/results/test_outputs/c"); do
+    echo "-- Converting '$root/test/results/test_outputs/c/$file' to csv..."
+    "$root/scripts/convert_to_csv.sh" "$root/test/results/test_outputs/c/$file" c
+done
+
+# First, lets create all raw cpp csv files
+for file in $(ls "$root/test/results/test_outputs/cpp"); do
+    echo "-- Converting '$root/test/results/test_outputs/cpp/$file' to csv..."
+    "$root/scripts/convert_to_csv.sh" "$root/test/results/test_outputs/cpp/$file"
 done
 
 # Then, collect the actual data we want (this is easier to do in C++ than in shell)
@@ -79,13 +85,11 @@ create_graph "Memory Usage (Reserve)" memory-usage-reserve "Memory Usage in MB" 
 echo "-- Creating the 'memory-usage-reserve-medium' graph..."
 create_graph "Memory Usage (Reserve, Medium)" memory-usage-reserve-medium "Memory Usage in MB" 0
 
-
 echo "-- Creating the 'alloc' graph..."
 create_graph "Allocation Time" alloc "Time in ms" 1
 
 echo "-- Creating the 'alloc-medium' graph..."
 create_graph "Allocation Time (Medium)" alloc-medium "Time in ms" 1
-
 
 echo "-- Creating the 'simple-ops' graph..."
 create_graph "Simple Ops" simple-ops "Time in ms" 1
@@ -93,13 +97,11 @@ create_graph "Simple Ops" simple-ops "Time in ms" 1
 echo "-- Creating the 'simple-ops-medium' graph..."
 create_graph "Simple Ops (Medium)" simple-ops-medium "Time in ms" 1
 
-
 echo "-- Creating the 'complex-ops' graph..."
 create_graph "Complex Ops" complex-ops "Time in ms" 1
 
 echo "-- Creating the 'complex-ops-medium' graph..."
 create_graph "Complex Ops (Medium)" complex-ops-medium "Time in ms" 1
-
 
 echo "-- Creating the 'dealloc' graph..."
 create_graph "Deallocation Time" dealloc "Time in ms" 1

@@ -219,28 +219,28 @@ static parsed_file std_unique_medium_csv;
 static parsed_file std_unique_medium_o1_csv;
 
 void load_parsed_files() {
-    dima_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima.csv");
-    dima_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima-o1.csv");
+    dima_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima.csv");
+    dima_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-o1.csv");
 
-    dima_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima-medium.csv");
-    dima_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima-medium-o1.csv");
+    dima_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-medium.csv");
+    dima_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-medium-o1.csv");
 
-    dima_reserve_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima-reserve.csv");
-    dima_reserve_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima-reserve-o1.csv");
+    dima_reserve_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve.csv");
+    dima_reserve_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-o1.csv");
 
-    dima_reserve_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "dima-reserve-medium.csv");
+    dima_reserve_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-medium.csv");
 
-    std_shared_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-shared.csv");
-    std_shared_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-shared-o1.csv");
+    std_shared_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared.csv");
+    std_shared_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-o1.csv");
 
-    std_shared_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-shared-medium.csv");
-    std_shared_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-shared-medium-o1.csv");
+    std_shared_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-medium.csv");
+    std_shared_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-medium-o1.csv");
 
-    std_unique_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-unique.csv");
-    std_unique_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-unique-o1.csv");
+    std_unique_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique.csv");
+    std_unique_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique-o1.csv");
 
-    std_unique_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-unique-medium.csv");
-    std_unique_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "std-unique-medium-o1.csv");
+    std_unique_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique-medium.csv");
+    std_unique_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique-medium-o1.csv");
 }
 
 /**

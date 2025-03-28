@@ -4,15 +4,18 @@
 # $2 - binary_name
 # $3 - additional flags (for example -O1)
 build_cpp() {
-    clang ./test/src/"$1" -o ./out/"$2" -lstdc++ -lm -g -std=c++17 -I./ -Itest/include "$3"
+    clang ./test/src/"$1" -o ./out/cpp/"$2" -lstdc++ -lm -g -std=c++17 -I./ -Itest/include "$3"
 }
 
 # $1 - file_name
 # $2 - binary_name
 # $3 - additional flags (for example -O1)
 build_c() {
-    clang ./test/src/"$1" -o ./out/"$2" -lc -lm -g -I./ -Itest/include "$3"
+    clang ./test/src/"$1" -o ./out/c/"$2" -lc -lm -g -I./ -Itest/include "$3"
 }
+
+mkdir -p ./out/c
+mkdir -p ./out/cpp
 
 if [ "$1" = "c" ]; then
     echo "--- Building 'dima-c'..."

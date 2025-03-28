@@ -5,6 +5,13 @@
 root="$(cd "$(dirname "$0")" && cd .. && pwd)"
 file="$(realpath "$1")"
 
+# Check if the csv is a c or cpp file
+if [ "$2" = "c" ]; then
+    type="c"
+else
+    type="cpp"
+fi
+
 if [ "$file" = "" ]; then
     echo "No file path provided!"
     exit 1
@@ -21,6 +28,8 @@ filename="$(basename "$file" | sed -e "s/\..*//g")"
 # Make sure the directory exists
 mkdir -p "$root/test/results/test_data"
 mkdir -p "$root/test/results/test_data/csv"
+mkdir -p "$root/test/results/test_data/csv/c"
+mkdir -p "$root/test/results/test_data/csv/cpp"
 
 # 1. Load the file
 # 2. Search for the | symbol
@@ -29,10 +38,10 @@ mkdir -p "$root/test/results/test_data/csv"
 # 5. Remove the first | and space
 # 6. Remove all ' MB' and ' ms' occurences
 # 7. Save the csv file
-cat "$file" \
-    | grep "|" \
-    | sed -E "s/[ ]+\|[ ]/,/g" \
-    | sed -E "s/[ ]+\|//g" \
-    | sed -E "s/\|[ ]//g" \
-    | sed -E "s/[ ]MB|[ ]ms//g" \
-    > "$root/test/results/test_data/csv/$filename.csv"
+cat "$file" |
+    grep "|" |
+    sed -E "s/[ ]+\|[ ]/,/g" |
+    sed -E "s/[ ]+\|//g" |
+    sed -E "s/\|[ ]//g" |
+    sed -E "s/[ ]MB|[ ]ms//g" \
+        >"$root/test/results/test_data/csv/$type/$filename.csv"
