@@ -82,6 +82,7 @@ void apply_complex_operation_malloc(Expression **variables, size_t len) {
 /// @brief The result struct of the test
 typedef struct {
     double memory_usage, alloc_time, simple_ops_time, complex_ops_time, free_time;
+    size_t used_slots, total_slots;
 } Result;
 
 /// @function `test_dima`
@@ -100,6 +101,8 @@ Result test_dima(const size_t n) {
         ALLOC(Expression, e);
         variables[i] = REF(Expression, e);
     }
+    size_t used_slots = GET_USED_COUNT(Expression);
+    size_t total_slots = GET_CAPACITY(Expression);
     gettimeofday(&alloc_end, NULL);
     apply_simple_operation_dima(variables, n);
     gettimeofday(&simple_ops_end, NULL);
@@ -117,7 +120,15 @@ Result test_dima(const size_t n) {
     double complex_ops_time =
         (complex_ops_end.tv_sec - simple_ops_end.tv_sec) * 1000.0 + (complex_ops_end.tv_usec - simple_ops_end.tv_usec) / 1000.0;
     double free_time = (free_end.tv_sec - complex_ops_end.tv_sec) * 1000.0 + (free_end.tv_usec - complex_ops_end.tv_usec) / 1000.0;
-    Result res = {memory_usage, alloc_time, simple_ops_time, complex_ops_time, free_time};
+    Result res = {
+        memory_usage,
+        alloc_time,
+        simple_ops_time,
+        complex_ops_time,
+        free_time,
+        used_slots,
+        total_slots,
+    };
     return res;
 }
 
@@ -149,7 +160,7 @@ Result test_malloc(const size_t n) {
     double complex_ops_time =
         (complex_ops_end.tv_sec - simple_ops_end.tv_sec) * 1000.0 + (complex_ops_end.tv_usec - simple_ops_end.tv_usec) / 1000.0;
     double free_time = (free_end.tv_sec - complex_ops_end.tv_sec) * 1000.0 + (free_end.tv_usec - complex_ops_end.tv_usec) / 1000.0;
-    Result res = {memory_usage, alloc_time, simple_ops_time, complex_ops_time, free_time};
+    Result res = {memory_usage, alloc_time, simple_ops_time, complex_ops_time, free_time, n, n};
     return res;
 }
 
@@ -161,7 +172,7 @@ Result test_malloc(const size_t n) {
 
 #define PRINT_ROW(N)                                                                                                                       \
     print_formatted_row(N, result_##N.memory_usage, result_##N.alloc_time, result_##N.simple_ops_time, result_##N.complex_ops_time,        \
-        result_##N.free_time);
+        result_##N.free_time, result_##N.used_slots, result_##N.total_slots);
 
 int main() {
     RUN_TEST(100)

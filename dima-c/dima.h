@@ -42,6 +42,8 @@ typedef struct {
 #define VAR(T, p) __attribute__((cleanup(dima_cleanup_##T))) T *p
 #define REF(T, ptr) dima_retain(&dima_head_##T, ptr)
 #define ALLOC(T, name) VAR(T, name) = (T *)dima_allocate(&dima_head_##T)
+#define GET_CAPACITY(T) dima_get_active_capacity(&dima_head_##T)
+#define GET_USED_COUNT(T) dima_get_used_count(&dima_head_##T)
 #define RESERVE(T, N) dima_reserve(&dima_head_##T, N)
 #define VAR_VALID(T, ptr) dima_is_valid(&dima_head_##T, ptr)
 #define RELEASE(T, ptr) dima_release(&dima_head_##T, ptr)
@@ -74,6 +76,10 @@ void *dima_allocate_in_block(DimaBlock *block);
 void *dima_allocate(DimaHead *head);
 
 void dima_reserve(DimaHead *head, size_t n);
+
+size_t dima_get_active_capacity(DimaHead *head);
+
+size_t dima_get_used_count(DimaHead *head);
 
 void *dima_retain(DimaHead *head, void *ptr);
 
@@ -237,6 +243,27 @@ void dima_reserve(DimaHead *head, size_t n) {
     head->blocks = (DimaBlock **)realloc(head->blocks, sizeof(DimaBlock *) * (block_index + 1));
     head->block_count++;
     head->blocks[block_index] = dima_create_block(head->slot_size, DIMA_BASE_SIZE << block_index);
+}
+
+size_t dima_get_active_capacity(DimaHead *head) {
+    size_t capacity = 0;
+    for (size_t i = 0; i < head->block_count; i++) {
+        if (head->blocks[i] != (DimaBlock *)NULL) {
+            capacity += DIMA_BASE_SIZE << i;
+        }
+    }
+    return capacity;
+}
+
+size_t dima_get_used_count(DimaHead *head) {
+    size_t used_count = 0;
+    for (size_t i = 0; i < head->block_count; i++) {
+        DimaBlock *block = head->blocks[i];
+        if (block != (DimaBlock *)NULL) {
+            used_count += block->used;
+        }
+    }
+    return used_count;
 }
 
 LC(3)
