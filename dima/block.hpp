@@ -91,6 +91,69 @@ namespace dima {
         size_t get_id() {
             return block_id;
         }
+
+        /// @function `allocate_array`
+        /// @brief Allocates an array of slots within this block, the array must be contiguous and surrounded by two free slots
+        ///
+        /// @param `length` The size of the array to create within this block
+        /// @param `args` The arguments with which to construct the slots
+        /// @return `std::optional<Array<T>>` The variable pointing to the start of the array, nullopt if the array does not fit into this
+        /// block
+        template <typename... Args> std::optional<Array<T>> allocate_array(const size_t length, Args &&...args) {
+            // Need length+2 contiguous slots (array + padding on both ends)
+            const size_t required = length + 2;
+
+            if (required > capacity || occupied_slots + required > capacity) {
+                return std::nullopt; // Not enough space in the block
+            }
+
+            // Find a contiguous space large enough
+            size_t contiguous_count = 0;
+            size_t start_position = 0;
+
+            // Scan through bitsets to find a contiguous region
+            for (size_t i = 0; i < free_slots.size(); i++) {
+                const std::bitset<BASE_SIZE> &set = free_slots[i];
+
+                // Process each bit in the current bitset
+                for (size_t j = 0; j < BASE_SIZE; j++) {
+                    size_t actual_idx = i * BASE_SIZE + j;
+                    if (actual_idx >= capacity)
+                        break; // Don't go beyond capacity
+
+                    if (!set[j]) { // If slot is free
+                        if (contiguous_count == 0) {
+                            start_position = actual_idx;
+                        }
+                        contiguous_count++;
+
+                        if (contiguous_count == required) {
+                            // Found enough contiguous space
+
+                            // Allocate the slots (skip the first padding slot)
+                            for (size_t k = 1; k <= length; k++) {
+                                size_t idx = start_position + k;
+                                free_slots[idx / BASE_SIZE][idx % BASE_SIZE] = true;
+                                slots[idx].allocate(std::forward<Args>(args)...);
+                            }
+
+                            // Update occupied slots count
+                            occupied_slots += length;
+
+                            // Create and return the Array
+                            return Array<T>(slots.begin() + start_position + 1, length);
+                        }
+                    } else {
+                        // Reset counter when we encounter an occupied slot
+                        contiguous_count = 0;
+                    }
+                }
+            }
+
+            // No suitable contiguous space found
+            return std::nullopt;
+        }
+
       private:
         /// @var `block_id`
         /// @brief The id of this block. Is also equal to the index of this block in the blocks vector

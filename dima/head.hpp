@@ -59,6 +59,59 @@ namespace dima {
             return blocks.back()->allocate(std::forward<Args>(args)...).value();
         }
 
+        /// @function `allocate_array`
+        /// @brief Allocates a new array of type `T` with size `length`, where all elements of said array are placed contiguously inside a
+        /// single block
+        ///
+        /// @param `length` The length of the array that will be created
+        /// @param `args` The arguments with which every slot in the array will be initialized
+        /// @return `Array<T>` The array node which provides a lot of QOL features for handling the array
+        template <typename... Args> Array<T> allocate_array(const size_t length, Args &&...args) {
+            // Try to allocate in an existing block
+            for (size_t i = blocks.size(); i > 0; i--) {
+                auto *block_ptr = blocks[i - 1].get();
+                if (block_ptr == nullptr) {
+                    continue;
+                }
+                if (block_ptr->get_free_count() >= length) {
+                    auto arr = block_ptr->allocate_array(length, std::forward<Args>(args)...);
+                    if (arr.has_value()) {
+                        return arr.value();
+                    }
+                }
+            }
+            // Apply the block mutex, as now definitely a new block will be added one way or the other
+            std::lock_guard<std::mutex> lock(blocks_mutex);
+
+            // Try to cerate a block that isnt created yet in the current blocks vector
+            for (size_t i = blocks.size(); i > 0; i--) {
+                if (blocks[i - 1] != nullptr) {
+                    continue;
+                }
+                const size_t block_capacity = BASE_SIZE << (i - 1);
+                if (block_capacity < length) {
+                    // Only smaller blocks will follow, so we need a bigger block than this
+                    break;
+                }
+                // Otherwise we can create a new block, that one should fit the array
+                blocks[i - 1] = std::make_unique<Block<T>>(i - 1, BASE_SIZE << (i - 1));
+                blocks[i - 1]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+                return blocks[i - 1]->allocate_array(length, std::forward<Args>(args)...).value();
+            }
+
+            // If all blocks are full, create a new block that has enough space for the array
+            size_t block_id = blocks.size();
+            while (BASE_SIZE << block_id < length) {
+                blocks.push_back(nullptr);
+                block_id++;
+            }
+            const size_t new_size = BASE_SIZE << block_id;
+            blocks.emplace_back(std::make_unique<Block<T>>(block_id, new_size));
+            blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+            // The now allocated array should **always** have a value
+            return blocks.back()->allocate_array(length, std::forward<Args>(args)...).value();
+        }
+
         /// @function `reserve`
         /// @brief Reserves enough space in the DIMA tree that at least `n` objects will fit in it. This function only creates the biggest
         /// block in the block list, which holds at least `(n / 2) + BASE_SIZE` elements, as block creation and block filling is done from

@@ -19,6 +19,17 @@ namespace dima {
             return head.allocate(std::forward<Args>(args)...);
         }
 
+        /// @function `allocate_array`
+        /// @brief Allocates a new array of type `T` with size `length`, where all elements of said array are placed contiguously inside a
+        /// single block
+        ///
+        /// @param `length` The length of the array that will be created
+        /// @param `args` The arguments with which every slot in the array will be initialized
+        /// @return `Array<T>` The array node which provides a lot of QOL features for handling the array
+        template <typename... Args> static inline Array<T> allocate_array(const size_t length, Args &&...args) {
+            return head.allocate_array(length, std::forward<Args>(args)...);
+        }
+
         /// @function `reserve`
         /// @brief Reserves enough space in the DIMA tree that at least `n` objects will fit in it. This function only creates the biggest
         /// block in the block list, which holds at least `(n / 2) + BASE_SIZE` elements, as block creation and block filling is done from
