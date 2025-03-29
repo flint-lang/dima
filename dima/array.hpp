@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <cstddef>
-#include <iostream>
 #include <vector>
 
 namespace dima {
@@ -238,23 +237,20 @@ namespace dima {
             return *this;
         }
         // Element access
-        T &operator[](size_t index) {
+        Var<T> operator[](size_t index) {
             assert(index < length);
-            return (first_slot + index)->value.value();
+            slot_iterator it = first_slot + index;
+            (*it).retain();
+            return Var<T>(&(*it));
         }
 
-        const T &operator[](size_t index) const {
+        const Var<T> operator[](size_t index) const {
             assert(index < length);
-            return (first_slot + index)->value.value();
+            slot_iterator it = first_slot + index;
+            (*it).retain();
+            return Var<T>(&(*it));
         }
 
-        // STL-compatible interface
-        T *data() {
-            return &(first_slot->value.value());
-        }
-        const T *data() const {
-            return &(first_slot->value.value());
-        }
         size_t size() const {
             return length;
         }
