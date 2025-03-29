@@ -87,8 +87,8 @@ namespace dima {
         /// @function `get`
         /// @brief Returns a raw pointer to the value saved inside the DIMA slot this Var references
         ///
-        /// @return `T *` The raw pointer to the value in the DIMA Slot
-        inline T *get() {
+        /// @return `T *const` The raw pointer to the value in the DIMA Slot, which cannot be changed
+        inline T *const get() {
             return slot->get();
         }
     };
