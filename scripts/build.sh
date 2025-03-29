@@ -2,16 +2,22 @@
 
 # $1 - file_name
 # $2 - binary_name
-# $3 - additional flags (for example -O1)
+# $N - additional flags (for example -O1)
 build_cpp() {
-    clang ./test/src/"$1" -o ./out/cpp/"$2" -lstdc++ -lm -g -std=c++17 -I./ -Itest/include "$3"
+    file_name="$1"
+    binary_name="$2"
+    shift 2
+    clang ./test/src/"$file_name" -o ./out/cpp/"$binary_name" -lstdc++ -lm -g -std=c++17 -I./ -Itest/include $@
 }
 
 # $1 - file_name
 # $2 - binary_name
-# $3 - additional flags (for example -O1)
+# $N - additional flags (for example -O1)
 build_c() {
-    clang ./test/src/"$1" -o ./out/c/"$2" -lc -lm -g -I./ -Itest/include "$3"
+    file_name="$1"
+    binary_name="$2"
+    shift 2
+    clang ./test/src/"$file_name" -o ./out/c/"$binary_name" -lc -lm -g -I./ -Itest/include $@
 }
 
 mkdir -p ./out/c
@@ -22,30 +28,30 @@ echo "-- Building the C test binaries..."
 echo "-- Building 'dima-c'..."
 build_c dima.c dima-c
 echo "-- Building 'dima-medium-c'..."
-build_c dima.c dima-medium-c "-DMEDIUM_TEST"
+build_c dima.c dima-medium-c -DMEDIUM_TEST
 echo "-- Building 'dima-reserve-c'..."
-build_c dima.c dima-reserve-c "-DDIMA_RESERVE"
+build_c dima.c dima-reserve-c -DDIMA_RESERVE
 echo "-- Building 'dima-reserve-medium-c'..."
-build_c dima.c dima-reserve-medium-c "-DMEDIUM_TEST -DDIMA_RESERVE"
+build_c dima.c dima-reserve-medium-c -DMEDIUM_TEST -DDIMA_RESERVE
 
 echo "-- Building 'malloc-c'..."
 build_c dima.c malloc-c "-DRUN_MALLOC_TEST"
 echo "-- Building 'malloc-medium-c'..."
-build_c dima.c malloc-medium-c "-DRUN_MALLOC_TEST -DMEDIUM_TEST"
+build_c dima.c malloc-medium-c -DRUN_MALLOC_TEST -DMEDIUM_TEST
 
 echo "-- Building 'dima-c-o1'..."
 build_c dima.c dima-c-o1 -O1
 echo "-- Building 'dima-medium-c-o1'..."
-build_c dima.c dima-medium-c-o1 "-DMEDIUM_TEST -O1"
+build_c dima.c dima-medium-c-o1 -DMEDIUM_TEST -O1
 echo "-- Building 'dima-reserve-c-o1'..."
-build_c dima.c dima-reserve-c-o1 "-DDIMA_RESERVE -O1"
+build_c dima.c dima-reserve-c-o1 -DDIMA_RESERVE -O1
 echo "-- Building 'dima-reserve-medium-c-o1'..."
-build_c dima.c dima-reserve-medium-c-o1 "-DMEDIUM_TEST -DDIMA_RESERVE -O1"
+build_c dima.c dima-reserve-medium-c-o1 -DMEDIUM_TEST -DDIMA_RESERVE -O1
 
 echo "-- Building 'malloc-c-o1'..."
-build_c dima.c malloc-c-o1 "-DRUN_MALLOC_TEST -O1"
+build_c dima.c malloc-c-o1 -DRUN_MALLOC_TEST -O1
 echo "-- Building 'malloc-medium-c-o1'..."
-build_c dima.c malloc-medium-c-o1 "-DRUN_MALLOC_TEST -DMEDIUM_TEST -O1"
+build_c dima.c malloc-medium-c-o1 -DRUN_MALLOC_TEST -DMEDIUM_TEST -O1
 
 if [ "$1" != "skip_cpp" ]; then
     echo
