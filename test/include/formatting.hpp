@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -48,31 +47,36 @@ void print_separator(size_t width) {
 }
 
 // Print a table row with proper formatting
-void print_row(                 //
-    const std::string &count,   //
-    const std::string &usage,   //
-    const std::string &alloc,   //
-    const std::string &simple,  //
-    const std::string &complex, //
-    const std::string &dealloc  //
+void print_row(                      //
+    const std::string &count,        //
+    const std::string &usage,        //
+    const std::string &alloc,        //
+    const std::string &simple,       //
+    const std::string &complex,      //
+    const std::string &dealloc,      //
+    const std::string &used_slots,   //
+    const std::string &slot_capacity //
 ) {
     const int col_width = 15;
-    std::cout << "| " << std::left << std::setw(10) << count //
-              << " | " << std::setw(col_width) << usage      //
-              << " | " << std::setw(col_width) << alloc      //
-              << " | " << std::setw(col_width) << simple     //
-              << " | " << std::setw(col_width) << complex    //
-              << " | " << std::setw(col_width) << dealloc    //
+    std::cout << "| " << std::left << std::setw(10) << count    //
+              << " | " << std::setw(col_width) << usage         //
+              << " | " << std::setw(col_width) << alloc         //
+              << " | " << std::setw(col_width) << simple        //
+              << " | " << std::setw(col_width) << complex       //
+              << " | " << std::setw(col_width) << dealloc       //
+              << " | " << std::setw(col_width) << used_slots    //
+              << " | " << std::setw(col_width) << slot_capacity //
               << " |" << std::endl;
 }
 
 // Print the results in a formatted table
-void print_results_table(const std::vector<std::pair<size_t, std::tuple<duration, duration, duration, duration, size_t>>> &results) {
+void print_results_table(
+    const std::vector<std::pair<size_t, std::tuple<duration, duration, duration, duration, size_t, size_t, size_t>>> &results) {
     // Table header
     std::cout << "\n=== Performance Benchmarks ===\n" << std::endl;
-    print_separator(104);
-    print_row("Objects", "Memory Usage", "Allocation", "Simple Ops", "Complex Ops", "Deallocation");
-    print_separator(104);
+    print_separator(140);
+    print_row("Objects", "Memory Usage", "Allocation", "Simple Ops", "Complex Ops", "Deallocation", "Used Slots", "Slot Capacity");
+    print_separator(140);
 
     // Table content
     for (const auto &[count, timings] : results) {
@@ -82,9 +86,11 @@ void print_results_table(const std::vector<std::pair<size_t, std::tuple<duration
             format_duration(std::get<0>(timings)), //
             format_duration(std::get<1>(timings)), //
             format_duration(std::get<2>(timings)), //
-            format_duration(std::get<3>(timings))  //
+            format_duration(std::get<3>(timings)), //
+            format_number(std::get<5>(timings)),   //
+            format_number(std::get<6>(timings))    //
         );
     }
 
-    print_separator(104);
+    print_separator(140);
 }

@@ -51,13 +51,14 @@ void apply_simple_operation(std::vector<dima::Var<Expression>> &variables) {
     }
 }
 
-std::tuple<duration, duration, duration, duration, size_t> test_n_allocations(const size_t n) {
+std::tuple<duration, duration, duration, duration, size_t, size_t, size_t> test_n_allocations(const size_t n) {
     auto start = std::chrono::high_resolution_clock::now();
     auto alloc_time = start;
     auto simple_time = start;
     auto complex_time = start;
     auto dealloc_start = start;
     size_t memory_usage = 0;
+    size_t slot_capacity = 0;
     {
         // Create multiple expressions
         std::vector<dima::Var<Expression>> variables;
@@ -65,6 +66,7 @@ std::tuple<duration, duration, duration, duration, size_t> test_n_allocations(co
         for (int i = 0; i < n; i++) {
             variables.emplace_back(Expression::allocate(std::string("expr_") + std::to_string(i)));
         }
+        slot_capacity = Expression::get_capacity();
         alloc_time = std::chrono::high_resolution_clock::now();
 
         // Now the operations
@@ -81,11 +83,11 @@ std::tuple<duration, duration, duration, duration, size_t> test_n_allocations(co
     std::chrono::duration<double, std::milli> calc_simp = simple_time - alloc_time;
     std::chrono::duration<double, std::milli> calc_comp = complex_time - simple_time;
     std::chrono::duration<double, std::milli> dealloc_time = end - dealloc_start;
-    return {alloc_dur, calc_simp, calc_comp, dealloc_time, memory_usage};
+    return {alloc_dur, calc_simp, calc_comp, dealloc_time, memory_usage, n, slot_capacity};
 }
 
 int main() {
-    std::vector<std::pair<size_t, std::tuple<duration, duration, duration, duration, size_t>>> all_results;
+    std::vector<std::pair<size_t, std::tuple<duration, duration, duration, duration, size_t, size_t, size_t>>> all_results;
 
     // Run tests with increasing object counts
     all_results.emplace_back(100, test_n_allocations(100));           // 100
