@@ -47,13 +47,28 @@ void print_row(const char *count, const char *usage, const char *alloc, const ch
     );
 }
 
+void format_count(char *buffer, const size_t n) {
+    if (n >= 1000000) {
+        // Format as millions with one decimal place
+        double millions = n / 1000000.0;
+        sprintf(buffer, "%.1fM", millions);
+    } else if (n >= 1000) {
+        // Format as thousands with one decimal place
+        double thousands = n / 1000.0;
+        sprintf(buffer, "%.1fK", thousands);
+    } else {
+        // Format as regular number
+        sprintf(buffer, "%zu", n);
+    }
+}
+
 void print_formatted_row(int count, double usage_mb, double alloc_ms, double simple_ms, double complex_ms, double dealloc_ms,
     size_t used_slots, size_t slot_capacity) {
     char count_str[32], usage_str[32], alloc_str[32];
     char simple_str[32], complex_str[32], dealloc_str[32];
     char used_slots_str[32], slot_capacity_str[32];
 
-    sprintf(count_str, "%d", count);
+    format_count(count_str, count);
     sprintf(usage_str, "%.2f MB", usage_mb);
     sprintf(alloc_str, "%.2f ms", alloc_ms);
     sprintf(simple_str, "%.2f ms", simple_ms);
