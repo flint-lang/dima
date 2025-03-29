@@ -268,8 +268,6 @@ There are some benchmarks that have been made. For the benchmarks to complete yo
 
 ![Memory Usage](./test/results/test_data/graphs/memory-usage.png)
 ![Memory Usage (Medium)](./test/results/test_data/graphs/memory-usage-medium.png)
-![Memory Usage (Reserve)](./test/results/test_data/graphs/memory-usage-reserve.png)
-![Memory Usage (Reserve, Medium)](./test/results/test_data/graphs/memory-usage-reserve-medium.png)
 
 The memory usage of DIMA, as you can see, is higher than the one of C++ std (`std` tests are _always_ `std::unique_ptr` tests, alltough DIMA actually has the functionality of `std::shared_ptr`s...). The "block"-pattern of DIMAs allocation system becomes quite clear in this graph, actually, but DIMA clearly uses more memory than `std` most of times.
 

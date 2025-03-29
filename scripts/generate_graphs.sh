@@ -27,10 +27,6 @@ echo "-- Packing data for the 'memory-usage' graph..."
 "$root/test/create_csv" memory-usage
 echo "-- Packing data for the 'memory-usage-medium' graph..."
 "$root/test/create_csv" memory-usage-medium
-echo "-- Packing data for the 'memory-usage-reserve' graph..."
-"$root/test/create_csv" memory-usage-reserve
-echo "-- Packing data for the 'memory-usage-reserve-medium' graph..."
-"$root/test/create_csv" memory-usage-reserve-medium
 
 echo "-- Packing data for the 'alloc-time' graph..."
 "$root/test/create_csv" alloc-time
