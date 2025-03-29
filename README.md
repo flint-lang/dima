@@ -122,6 +122,13 @@ int main() {
 }
 ```
 
+which prints:
+
+```
+var: (5, 2)
+var2: (3, 10)
+```
+
 You can also get a raw non-owning pointer to the value saved in the DIMA slot directly:
 
 ```cpp
@@ -136,12 +143,34 @@ int main() {
 }
 ```
 
-This program, just like the above program, both will print
+This program will print
 
 ```
 var: (5, 10)
 var2: (5, 10)
 ```
+
+The `dima::Var<T>` variable also can be passed to functions directly:
+
+```cpp
+void inc(dima::Var<YourType> var) {
+    var->x++;
+    var->y++;
+}
+
+void print(dima::Var<YourType> var) {
+    std::cout << "var: (" << var->x << ", " << var->y << ")" << std::endl;
+}
+
+int main() {
+    auto var = YourType::allocate(1, 2);
+    inc(vec);
+    print(vec);
+    return 0;
+}
+```
+
+This program will print `vec: (2, 3)` to the console. Also, it is recommended that a variable of type `dima::Var<T>` is always passed as a copy instead of as a reference. This way, DIMA's internal reference counting will always have the active variable count. The Var variable does not contain the actual data, nor does it contain the ARC, it is just "the frontend" of DIMA, with which to interact with.
 
 to the console. With the `Var<T>` variable, you actually **never** have an owning value type, the raw value of `T` is **always** owned by DIMA. DIMA is an automatic memory management system that also doesnt rely on garbage collection (GC). The library itself actually is quite simple, if you are interested on how it works internally, check out the source code directly.
 
