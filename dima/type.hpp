@@ -15,7 +15,7 @@ namespace dima {
         ///
         /// @param `args` The arguments with which to create the type T slot
         /// @return `Var<T>` A variable node to the allocated object of type `T`
-        template <typename... Args> static inline dima::Var<T> allocate(Args &&...args) {
+        template <typename... Args> static inline Var<T> allocate(Args &&...args) {
             return head.allocate(std::forward<Args>(args)...);
         }
 
@@ -65,6 +65,6 @@ namespace dima {
       private:
         /// @var `head`
         /// @brief The static DIMA head instance for this type
-        static inline dima::Head<T> head;
+        static inline Head<T> head;
     };
 } // namespace dima
