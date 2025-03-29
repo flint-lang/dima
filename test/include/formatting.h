@@ -21,11 +21,11 @@ void print_line() {
 void print_header() {
     print_line();
     printf("| %-10s | %-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %-*s |\n", //
-        "Count", COL_WIDTH,                                                //
+        "Objects", COL_WIDTH,                                              //
         "Memory Usage", COL_WIDTH,                                         //
         "Allocation", COL_WIDTH,                                           //
-        "Simple Op", COL_WIDTH,                                            //
-        "Complex Op", COL_WIDTH,                                           //
+        "Simple Ops", COL_WIDTH,                                           //
+        "Complex Ops", COL_WIDTH,                                          //
         "Deallocation", COL_WIDTH,                                         //
         "Used Slots", COL_WIDTH,                                           //
         "Slot Capacity"                                                    //
