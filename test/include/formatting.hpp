@@ -87,8 +87,8 @@ void print_results_table(
             format_duration(std::get<1>(timings)), //
             format_duration(std::get<2>(timings)), //
             format_duration(std::get<3>(timings)), //
-            format_number(std::get<5>(timings)),   //
-            format_number(std::get<6>(timings))    //
+            std::to_string(std::get<5>(timings)),  //
+            std::to_string(std::get<6>(timings))   //
         );
     }
 
