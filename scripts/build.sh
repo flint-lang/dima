@@ -17,35 +17,40 @@ build_c() {
 mkdir -p ./out/c
 mkdir -p ./out/cpp
 
-if [ "$1" = "c" ]; then
-    echo "--- Building 'dima-c'..."
-    build_c dima.c dima-c
-    echo "--- Building 'dima-medium-c'..."
-    build_c dima.c dima-medium-c "-DMEDIUM_TEST"
-    echo "--- Building 'dima-reserve-c'..."
-    build_c dima.c dima-reserve-c "-DDIMA_RESERVE"
-    echo "--- Building 'dima-reserve-medium-c'..."
-    build_c dima.c dima-reserve-medium-c "-DMEDIUM_TEST -DDIMA_RESERVE"
+echo "-- Building the C test binaries..."
 
-    echo "--- Building 'malloc-c'..."
-    build_c dima.c malloc-c "-DRUN_MALLOC_TEST"
-    echo "--- Building 'malloc-medium-c'..."
-    build_c dima.c malloc-medium-c "-DRUN_MALLOC_TEST -DMEDIUM_TEST"
+echo "-- Building 'dima-c'..."
+build_c dima.c dima-c
+echo "-- Building 'dima-medium-c'..."
+build_c dima.c dima-medium-c "-DMEDIUM_TEST"
+echo "-- Building 'dima-reserve-c'..."
+build_c dima.c dima-reserve-c "-DDIMA_RESERVE"
+echo "-- Building 'dima-reserve-medium-c'..."
+build_c dima.c dima-reserve-medium-c "-DMEDIUM_TEST -DDIMA_RESERVE"
 
-    echo "--- Building 'dima-c-o1'..."
-    build_c dima.c dima-c-o1 -O1
-    echo "--- Building 'dima-medium-c-o1'..."
-    build_c dima.c dima-medium-c-o1 "-DMEDIUM_TEST -O1"
-    echo "--- Building 'dima-reserve-c-o1'..."
-    build_c dima.c dima-reserve-c-o1 "-DDIMA_RESERVE -O1"
-    echo "--- Building 'dima-reserve-medium-c-o1'..."
-    build_c dima.c dima-reserve-medium-c-o1 "-DMEDIUM_TEST -DDIMA_RESERVE -O1"
+echo "-- Building 'malloc-c'..."
+build_c dima.c malloc-c "-DRUN_MALLOC_TEST"
+echo "-- Building 'malloc-medium-c'..."
+build_c dima.c malloc-medium-c "-DRUN_MALLOC_TEST -DMEDIUM_TEST"
 
-    echo "--- Building 'malloc-c-o1'..."
-    build_c dima.c malloc-c "-DRUN_MALLOC_TEST -O1"
-    echo "--- Building 'malloc-medium-c-o1'..."
-    build_c dima.c malloc-medium-c "-DRUN_MALLOC_TEST -DMEDIUM_TEST -O1"
-else
+echo "-- Building 'dima-c-o1'..."
+build_c dima.c dima-c-o1 -O1
+echo "-- Building 'dima-medium-c-o1'..."
+build_c dima.c dima-medium-c-o1 "-DMEDIUM_TEST -O1"
+echo "-- Building 'dima-reserve-c-o1'..."
+build_c dima.c dima-reserve-c-o1 "-DDIMA_RESERVE -O1"
+echo "-- Building 'dima-reserve-medium-c-o1'..."
+build_c dima.c dima-reserve-medium-c-o1 "-DMEDIUM_TEST -DDIMA_RESERVE -O1"
+
+echo "-- Building 'malloc-c-o1'..."
+build_c dima.c malloc-c-o1 "-DRUN_MALLOC_TEST -O1"
+echo "-- Building 'malloc-medium-c-o1'..."
+build_c dima.c malloc-medium-c-o1 "-DRUN_MALLOC_TEST -DMEDIUM_TEST -O1"
+
+if [ "$1" != "skip_cpp" ]; then
+    echo
+    echo "-- Building the C++ test binaries..."
+
     echo "-- Building 'dima'..."
     build_cpp dima.cpp dima
     echo "-- Building 'dima-medium'..."
@@ -70,6 +75,8 @@ else
     build_cpp dima_medium.cpp dima-medium-o1 -O1
     echo "-- Building 'dima-reserve-o1'..."
     build_cpp dima_reserve.cpp dima-reserve-o1 -O1
+    echo "-- Building 'dima-reserve-medium-o1'..."
+    build_cpp dima_reserve_medium.cpp dima-reserve-medium-o1 -O1
 
     echo "-- Building 'std-shared-o1'..."
     build_cpp std_shared.cpp std-shared-o1 -O1
