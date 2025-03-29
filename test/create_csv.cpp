@@ -195,54 +195,80 @@ void save_parsed_file_at(const parsed_file &file, const std::filesystem::path &p
 
 static std::filesystem::path results_path;
 
+// === THE C++ CSV FILES ===
 static parsed_file dima_csv;
 static parsed_file dima_o1_csv;
-
 static parsed_file dima_medium_csv;
 static parsed_file dima_medium_o1_csv;
 
 static parsed_file dima_reserve_csv;
 static parsed_file dima_reserve_o1_csv;
-
 static parsed_file dima_reserve_medium_csv;
 static parsed_file dima_reserve_medium_o1_csv;
 
 static parsed_file std_shared_csv;
 static parsed_file std_shared_o1_csv;
-
 static parsed_file std_shared_medium_csv;
 static parsed_file std_shared_medium_o1_csv;
 
 static parsed_file std_unique_csv;
 static parsed_file std_unique_o1_csv;
-
 static parsed_file std_unique_medium_csv;
 static parsed_file std_unique_medium_o1_csv;
 
+// === THE C CSV FILES ===
+static parsed_file dima_c_csv;
+static parsed_file dima_c_o1_csv;
+static parsed_file dima_medium_c_csv;
+static parsed_file dima_medium_c_o1_csv;
+
+static parsed_file dima_reserve_c_csv;
+static parsed_file dima_reserve_c_o1_csv;
+static parsed_file dima_reserve_medium_c_csv;
+static parsed_file dima_reserve_medium_c_o1_csv;
+
+static parsed_file malloc_c_csv;
+static parsed_file malloc_c_o1_csv;
+static parsed_file malloc_medium_c_csv;
+static parsed_file malloc_medium_c_o1_csv;
+
 void load_parsed_files() {
+    // === THE C++ CSV FILES ===
     dima_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima.csv");
     dima_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-o1.csv");
-
     dima_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-medium.csv");
     dima_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-medium-o1.csv");
 
     dima_reserve_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve.csv");
     dima_reserve_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-o1.csv");
-
     dima_reserve_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-medium.csv");
     dima_reserve_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-medium-o1.csv");
 
     std_shared_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared.csv");
     std_shared_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-o1.csv");
-
     std_shared_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-medium.csv");
     std_shared_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-medium-o1.csv");
 
     std_unique_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique.csv");
     std_unique_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique-o1.csv");
-
     std_unique_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique-medium.csv");
     std_unique_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-unique-medium-o1.csv");
+
+    // === THE C CSV FILES ===
+    dima_c_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-c.csv");
+    dima_c_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-c-o1.csv");
+    dima_medium_c_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-medium-c.csv");
+    dima_medium_c_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-medium-c-o1.csv");
+
+    dima_reserve_c_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-reserve-c.csv");
+    dima_reserve_c_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-reserve-c-o1.csv");
+    dima_reserve_medium_c_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-reserve-medium-c.csv");
+    dima_reserve_medium_c_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "dima-reserve-medium-c-o1.csv");
+
+    malloc_c_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "malloc-c.csv");
+    malloc_c_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "malloc-c-o1.csv");
+    malloc_medium_c_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "malloc-medium-c.csv");
+    malloc_medium_c_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "c" / "malloc-medium-c-o1.csv");
 }
 
 /**
@@ -282,20 +308,26 @@ void create_csv_memory_usage() {
     // The memory usage is exactly the same in -o1 and non optimized code, so we can leave out all optimized versions entirely
     parsed_file extracted_data;
     extract_column_and_add_to(extracted_data, dima_csv, "Objects", "Objects");
-    extract_column_and_add_to(extracted_data, std_shared_csv, "Memory Usage", "Shared");
-    extract_column_and_add_to(extracted_data, std_unique_csv, "Memory Usage", "Unique");
     extract_column_and_add_to(extracted_data, dima_csv, "Memory Usage", "Dima");
     extract_column_and_add_to(extracted_data, dima_reserve_csv, "Memory Usage", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Memory Usage", "Dima-C");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_csv, "Memory Usage", "Dima-Reserve-C");
+    extract_column_and_add_to(extracted_data, std_shared_csv, "Memory Usage", "Shared");
+    extract_column_and_add_to(extracted_data, std_unique_csv, "Memory Usage", "Unique");
+    extract_column_and_add_to(extracted_data, malloc_c_csv, "Memory Usage", "Malloc-C");
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "memory-usage.csv");
 }
 
 void create_csv_memory_usage_medium() {
     parsed_file extracted_data;
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Objects", "Objects");
-    extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Memory Usage", "Shared");
-    extract_column_and_add_to(extracted_data, std_unique_medium_csv, "Memory Usage", "Unique");
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Memory Usage", "Dima");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_csv, "Memory Usage", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Memory Usage", "Dima-C");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_csv, "Memory Usage", "Dima-Reserve-C");
+    extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Memory Usage", "Shared");
+    extract_column_and_add_to(extracted_data, std_unique_medium_csv, "Memory Usage", "Unique");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_csv, "Memory Usage", "Malloc-C");
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "memory-usage-medium.csv");
 }
 
@@ -313,6 +345,18 @@ void create_csv_alloc_time() {
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "alloc.csv");
 }
 
+void create_csv_alloc_time_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_c_o1_csv, "Allocation", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_csv, "Allocation", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_o1_csv, "Allocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_c_csv, "Allocation", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_c_o1_csv, "Allocation", "Malloc-C");
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Allocation", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "alloc-c.csv");
+}
+
 void create_csv_alloc_time_medium() {
     parsed_file extracted_data;
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Objects", "Objects");
@@ -325,6 +369,18 @@ void create_csv_alloc_time_medium() {
     extract_column_and_add_to(extracted_data, std_unique_medium_o1_csv, "Allocation", "Unique-O1");
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Allocation", "Dima");
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "alloc-medium.csv");
+}
+
+void create_csv_alloc_time_medium_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_medium_c_o1_csv, "Allocation", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_csv, "Allocation", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_o1_csv, "Allocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_csv, "Allocation", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_o1_csv, "Allocation", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Allocation", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "alloc-medium-c.csv");
 }
 
 void create_csv_dealloc_time() {
@@ -341,6 +397,18 @@ void create_csv_dealloc_time() {
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "dealloc.csv");
 }
 
+void create_csv_dealloc_time_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_c_o1_csv, "Deallocation", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_csv, "Deallocation", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_o1_csv, "Deallocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_c_csv, "Deallocation", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_c_o1_csv, "Deallocation", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Deallocation", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "dealloc-c.csv");
+}
+
 void create_csv_dealloc_time_medium() {
     parsed_file extracted_data;
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Objects", "Objects");
@@ -353,6 +421,18 @@ void create_csv_dealloc_time_medium() {
     extract_column_and_add_to(extracted_data, std_unique_medium_o1_csv, "Deallocation", "Unique-O1");
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Deallocation", "Dima");
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "dealloc-medium.csv");
+}
+
+void create_csv_dealloc_time_medium_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_medium_c_o1_csv, "Deallocation", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_csv, "Deallocation", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_o1_csv, "Deallocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_csv, "Deallocation", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_o1_csv, "Deallocation", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Deallocation", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "dealloc-medium-c.csv");
 }
 
 void create_csv_simple_op() {
@@ -369,6 +449,18 @@ void create_csv_simple_op() {
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "simple-ops.csv");
 }
 
+void create_csv_simple_op_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_c_o1_csv, "Simple Ops", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_csv, "Simple Ops", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_o1_csv, "Simple Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_c_csv, "Simple Ops", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_c_o1_csv, "Simple Ops", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Simple Ops", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "simple-ops-c.csv");
+}
+
 void create_csv_simple_op_medium() {
     parsed_file extracted_data;
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Objects", "Objects");
@@ -381,6 +473,18 @@ void create_csv_simple_op_medium() {
     extract_column_and_add_to(extracted_data, std_unique_medium_o1_csv, "Simple Ops", "Unique-O1");
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Simple Ops", "Dima");
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "simple-ops-medium.csv");
+}
+
+void create_csv_simple_op_medium_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_medium_c_o1_csv, "Simple Ops", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_csv, "Simple Ops", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_o1_csv, "Simple Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_csv, "Simple Ops", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_o1_csv, "Simple Ops", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Simple Ops", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "simple-ops-medium-c.csv");
 }
 
 void create_csv_complex_op() {
@@ -397,6 +501,18 @@ void create_csv_complex_op() {
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "complex-ops.csv");
 }
 
+void create_csv_complex_op_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_c_o1_csv, "Complex Ops", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_csv, "Complex Ops", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_c_o1_csv, "Complex Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_c_csv, "Complex Ops", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_c_o1_csv, "Complex Ops", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_c_csv, "Complex Ops", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "complex-ops-c.csv");
+}
+
 void create_csv_complex_op_medium() {
     parsed_file extracted_data;
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Objects", "Objects");
@@ -409,6 +525,18 @@ void create_csv_complex_op_medium() {
     extract_column_and_add_to(extracted_data, std_unique_medium_o1_csv, "Complex Ops", "Unique-O1");
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Complex Ops", "Dima");
     save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "complex-ops-medium.csv");
+}
+
+void create_csv_complex_op_medium_c() {
+    parsed_file extracted_data;
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Objects", "Objects");
+    extract_column_and_add_to(extracted_data, dima_medium_c_o1_csv, "Complex Ops", "Dima-O1");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_csv, "Complex Ops", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_reserve_medium_c_o1_csv, "Complex Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_csv, "Complex Ops", "Malloc");
+    extract_column_and_add_to(extracted_data, malloc_medium_c_o1_csv, "Complex Ops", "Malloc-O1");
+    extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Complex Ops", "Dima");
+    save_parsed_file_at(extracted_data, results_path / "test_data" / "processed" / "complex-ops-medium-c.csv");
 }
 
 // This is a dirty little script to create our graphs from the given csv files
@@ -427,20 +555,36 @@ int main(int argc, char *argv[]) {
         create_csv_memory_usage_medium();
     } else if (arg == "alloc-time") {
         create_csv_alloc_time();
+    } else if (arg == "alloc-time-c") {
+        create_csv_alloc_time_c();
     } else if (arg == "alloc-time-medium") {
         create_csv_alloc_time_medium();
+    } else if (arg == "alloc-time-medium-c") {
+        create_csv_alloc_time_medium_c();
     } else if (arg == "dealloc-time") {
         create_csv_dealloc_time();
+    } else if (arg == "dealloc-time-c") {
+        create_csv_dealloc_time_c();
     } else if (arg == "dealloc-time-medium") {
         create_csv_dealloc_time_medium();
+    } else if (arg == "dealloc-time-medium-c") {
+        create_csv_dealloc_time_medium_c();
     } else if (arg == "simple-op") {
         create_csv_simple_op();
+    } else if (arg == "simple-op-c") {
+        create_csv_simple_op_c();
     } else if (arg == "simple-op-medium") {
         create_csv_simple_op_medium();
+    } else if (arg == "simple-op-medium-c") {
+        create_csv_simple_op_medium_c();
     } else if (arg == "complex-op") {
         create_csv_complex_op();
+    } else if (arg == "complex-op-c") {
+        create_csv_complex_op_c();
     } else if (arg == "complex-op-medium") {
         create_csv_complex_op_medium();
+    } else if (arg == "complex-op-medium-c") {
+        create_csv_complex_op_medium_c();
     } else {
         std::cout << "unknown argument: " << arg << std::endl;
         return 1;

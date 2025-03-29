@@ -30,23 +30,39 @@ echo "-- Packing data for the 'memory-usage-medium' graph..."
 
 echo "-- Packing data for the 'alloc-time' graph..."
 "$root/test/create_csv" alloc-time
+echo "-- Packing data for the 'alloc-time-c' graph..."
+"$root/test/create_csv" alloc-time-c
 echo "-- Packing data for the 'alloc-time-medium' graph..."
 "$root/test/create_csv" alloc-time-medium
+echo "-- Packing data for the 'alloc-time-medium-c' graph..."
+"$root/test/create_csv" alloc-time-medium-c
 
 echo "-- Packing data for the 'dealloc-time' graph..."
 "$root/test/create_csv" dealloc-time
+echo "-- Packing data for the 'dealloc-time-c' graph..."
+"$root/test/create_csv" dealloc-time-c
 echo "-- Packing data for the 'dealloc-time-medium' graph..."
 "$root/test/create_csv" dealloc-time-medium
+echo "-- Packing data for the 'dealloc-time-medium-c' graph..."
+"$root/test/create_csv" dealloc-time-medium-c
 
 echo "-- Packing data for the 'simple-op' graph..."
 "$root/test/create_csv" simple-op
+echo "-- Packing data for the 'simple-op-c' graph..."
+"$root/test/create_csv" simple-op-c
 echo "-- Packing data for the 'simple-op-medium' graph..."
 "$root/test/create_csv" simple-op-medium
+echo "-- Packing data for the 'simple-op-medium-c' graph..."
+"$root/test/create_csv" simple-op-medium-c
 
 echo "-- Packing data for the 'complex-op' graph..."
 "$root/test/create_csv" complex-op
+echo "-- Packing data for the 'complex-op-c' graph..."
+"$root/test/create_csv" complex-op-c
 echo "-- Packing data for the 'complex-op-medium' graph..."
 "$root/test/create_csv" complex-op-medium
+echo "-- Packing data for the 'complex-op-medium-c' graph..."
+"$root/test/create_csv" complex-op-medium-c
 
 echo
 
@@ -75,32 +91,44 @@ create_graph "Memory Usage" memory-usage "Memory Usage in MB" 0
 echo "-- Creating the 'memory-usage-medium' graph..."
 create_graph "Memory Usage (Medium)" memory-usage-medium "Memory Usage in MB" 0
 
-echo "-- Creating the 'memory-usage-reserve' graph..."
-create_graph "Memory Usage (Reserve)" memory-usage-reserve "Memory Usage in MB" 0
-
-echo "-- Creating the 'memory-usage-reserve-medium' graph..."
-create_graph "Memory Usage (Reserve, Medium)" memory-usage-reserve-medium "Memory Usage in MB" 0
-
 echo "-- Creating the 'alloc' graph..."
 create_graph "Allocation Time" alloc "Time in ms" 1
+
+echo "-- Creating the 'alloc-c' graph..."
+create_graph "Allocation Time (C)" alloc-c "Time in ms" 1
 
 echo "-- Creating the 'alloc-medium' graph..."
 create_graph "Allocation Time (Medium)" alloc-medium "Time in ms" 1
 
+echo "-- Creating the 'alloc-medium-c' graph..."
+create_graph "Allocation Time (C, Medium)" alloc-medium-c "Time in ms" 1
+
 echo "-- Creating the 'simple-ops' graph..."
 create_graph "Simple Ops" simple-ops "Time in ms" 1
+
+echo "-- Creating the 'simple-ops-c' graph..."
+create_graph "Simple Ops (C)" simple-ops-c "Time in ms" 1
 
 echo "-- Creating the 'simple-ops-medium' graph..."
 create_graph "Simple Ops (Medium)" simple-ops-medium "Time in ms" 1
 
+echo "-- Creating the 'simple-ops-medium-c' graph..."
+create_graph "Simple Ops (C, Medium)" simple-ops-medium-c "Time in ms" 1
+
 echo "-- Creating the 'complex-ops' graph..."
 create_graph "Complex Ops" complex-ops "Time in ms" 1
 
-echo "-- Creating the 'complex-ops-medium' graph..."
-create_graph "Complex Ops (Medium)" complex-ops-medium "Time in ms" 1
+echo "-- Creating the 'complex-ops-c' graph..."
+create_graph "Complex Ops (C)" complex-ops-c "Time in ms" 1
+
+echo "-- Creating the 'complex-ops-medium-c' graph..."
+create_graph "Complex Ops (C, Medium)" complex-ops-medium-c "Time in ms" 1
 
 echo "-- Creating the 'dealloc' graph..."
 create_graph "Deallocation Time" dealloc "Time in ms" 1
 
-echo "-- Creating the 'dealloc-medium' graph..."
-create_graph "Deallocation TIme (Medium)" dealloc-medium "Time in ms" 1
+echo "-- Creating the 'dealloc-c' graph..."
+create_graph "Deallocation Time (C)" dealloc-c "Time in ms" 1
+
+echo "-- Creating the 'dealloc-medium-c' graph..."
+create_graph "Deallocation TIme (C, Medium)" dealloc-medium-c "Time in ms" 1
