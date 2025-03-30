@@ -124,6 +124,9 @@ create_graph "Complex Ops (C)" complex-ops-c "Time in ms" 1
 echo "-- Creating the 'complex-ops-medium-c' graph..."
 create_graph "Complex Ops (C, Medium)" complex-ops-medium-c "Time in ms" 1
 
+echo "-- Creating the 'complex-ops-medium' graph..."
+create_graph "Complex Ops (Medium)" complex-ops-medium "Time in ms" 1
+
 echo "-- Creating the 'dealloc' graph..."
 create_graph "Deallocation Time" dealloc "Time in ms" 1
 
@@ -132,3 +135,6 @@ create_graph "Deallocation Time (C)" dealloc-c "Time in ms" 1
 
 echo "-- Creating the 'dealloc-medium-c' graph..."
 create_graph "Deallocation TIme (C, Medium)" dealloc-medium-c "Time in ms" 1
+
+echo "-- Creating the 'dealloc-medium' graph..."
+create_graph "Deallocation TIme (Medium)" dealloc-medium "Time in ms" 1
