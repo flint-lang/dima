@@ -61,16 +61,16 @@ set xtics nomirror
 set key autotitle columnhead
 
 # Define some distinctive line colors and styles to cycle through
-set style line 1 linecolor rgb "#FF0000" linewidth 2 pointtype 7 pointsize 1.2  # Red
-set style line 2 linecolor rgb "#00FF00" linewidth 2 pointtype 9 pointsize 1.2  # Green
-set style line 3 linecolor rgb "#0000FF" linewidth 2 pointtype 5 pointsize 1.2  # Blue
-set style line 4 linecolor rgb "#FF00FF" linewidth 2 pointtype 11 pointsize 1.2 # Magenta
-set style line 5 linecolor rgb "#00FFFF" linewidth 2 pointtype 13 pointsize 1.2 # Cyan
-set style line 6 linecolor rgb "#FFFF00" linewidth 2 pointtype 6 pointsize 1.2  # Yellow
-set style line 7 linecolor rgb "#000000" linewidth 2 pointtype 8 pointsize 1.2  # Black
-set style line 8 linecolor rgb "#FF8000" linewidth 2 pointtype 4 pointsize 1.2  # Orange
-set style line 9 linecolor rgb "#8000FF" linewidth 2 pointtype 12 pointsize 1.2 # Purple
-set style line 10 linecolor rgb "#008080" linewidth 2 pointtype 10 pointsize 1.2 # Teal
+set style line 1 linecolor rgb "#FF0000" linewidth 1.5 pointtype 7 pointsize 1.0  # Red
+set style line 2 linecolor rgb "#00FF00" linewidth 1.5 pointtype 9 pointsize 1.0  # Green
+set style line 3 linecolor rgb "#0000FF" linewidth 1.5 pointtype 5 pointsize 1.0  # Blue
+set style line 4 linecolor rgb "#FF00FF" linewidth 1.5 pointtype 11 pointsize 1.0 # Magenta
+set style line 5 linecolor rgb "#00FFFF" linewidth 1.5 pointtype 13 pointsize 1.0 # Cyan
+set style line 6 linecolor rgb "#FFFF00" linewidth 1.5 pointtype 6 pointsize 1.0  # Yellow
+set style line 7 linecolor rgb "#000000" linewidth 1.5 pointtype 8 pointsize 1.0  # Black
+set style line 8 linecolor rgb "#FF8000" linewidth 1.5 pointtype 4 pointsize 1.0  # Orange
+set style line 9 linecolor rgb "#8000FF" linewidth 1.5 pointtype 12 pointsize 1.0 # Purple
+set style line 10 linecolor rgb "#008080" linewidth 1.5 pointtype 10 pointsize 1.0 # Teal
 
 # Safer way to get column count - creates a temporary file with the count
 system("head -1 \"" . input_file . "\" | tr ',' ' ' | wc -w | tr -d '[:space:]' > column_count.tmp")

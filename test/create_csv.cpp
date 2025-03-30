@@ -206,6 +206,11 @@ static parsed_file dima_reserve_o1_csv;
 static parsed_file dima_reserve_medium_csv;
 static parsed_file dima_reserve_medium_o1_csv;
 
+static parsed_file dima_array_csv;
+static parsed_file dima_array_o1_csv;
+static parsed_file dima_array_medium_csv;
+static parsed_file dima_array_medium_o1_csv;
+
 static parsed_file std_shared_csv;
 static parsed_file std_shared_o1_csv;
 static parsed_file std_shared_medium_csv;
@@ -243,6 +248,11 @@ void load_parsed_files() {
     dima_reserve_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-o1.csv");
     dima_reserve_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-medium.csv");
     dima_reserve_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-reserve-medium-o1.csv");
+
+    dima_array_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-array.csv");
+    dima_array_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-array-o1.csv");
+    dima_array_medium_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-array-medium.csv");
+    dima_array_medium_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "dima-array-medium-o1.csv");
 
     std_shared_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared.csv");
     std_shared_o1_csv = parse_csv_file(results_path / "test_data" / "csv" / "cpp" / "std-shared-o1.csv");
@@ -310,6 +320,7 @@ void create_csv_memory_usage() {
     extract_column_and_add_to(extracted_data, dima_csv, "Objects", "Objects");
     extract_column_and_add_to(extracted_data, dima_csv, "Memory Usage", "Dima");
     extract_column_and_add_to(extracted_data, dima_reserve_csv, "Memory Usage", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_array_csv, "Memory Usage", "Dima-Array");
     extract_column_and_add_to(extracted_data, dima_c_csv, "Memory Usage", "Dima-C");
     extract_column_and_add_to(extracted_data, dima_reserve_c_csv, "Memory Usage", "Dima-Reserve-C");
     extract_column_and_add_to(extracted_data, std_shared_csv, "Memory Usage", "Shared");
@@ -323,6 +334,7 @@ void create_csv_memory_usage_medium() {
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Objects", "Objects");
     extract_column_and_add_to(extracted_data, dima_medium_csv, "Memory Usage", "Dima");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_csv, "Memory Usage", "Dima-Reserve");
+    extract_column_and_add_to(extracted_data, dima_array_medium_csv, "Memory Usage", "Dima-Array");
     extract_column_and_add_to(extracted_data, dima_medium_c_csv, "Memory Usage", "Dima-C");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_c_csv, "Memory Usage", "Dima-Reserve-C");
     extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Memory Usage", "Shared");
@@ -337,6 +349,8 @@ void create_csv_alloc_time() {
     extract_column_and_add_to(extracted_data, dima_o1_csv, "Allocation", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_csv, "Allocation", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_o1_csv, "Allocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_csv, "Allocation", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_o1_csv, "Allocation", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_csv, "Allocation", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_o1_csv, "Allocation", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_csv, "Allocation", "Unique");
@@ -363,6 +377,8 @@ void create_csv_alloc_time_medium() {
     extract_column_and_add_to(extracted_data, dima_medium_o1_csv, "Allocation", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_csv, "Allocation", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_o1_csv, "Allocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_medium_csv, "Allocation", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_medium_o1_csv, "Allocation", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Allocation", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_medium_o1_csv, "Allocation", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_medium_csv, "Allocation", "Unique");
@@ -389,6 +405,8 @@ void create_csv_dealloc_time() {
     extract_column_and_add_to(extracted_data, dima_o1_csv, "Deallocation", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_csv, "Deallocation", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_o1_csv, "Deallocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_csv, "Deallocation", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_o1_csv, "Deallocation", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_csv, "Deallocation", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_o1_csv, "Deallocation", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_csv, "Deallocation", "Unique");
@@ -415,6 +433,8 @@ void create_csv_dealloc_time_medium() {
     extract_column_and_add_to(extracted_data, dima_medium_o1_csv, "Deallocation", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_csv, "Deallocation", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_o1_csv, "Deallocation", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_medium_csv, "Deallocation", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_medium_o1_csv, "Deallocation", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Deallocation", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_medium_o1_csv, "Deallocation", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_medium_csv, "Deallocation", "Unique");
@@ -441,6 +461,8 @@ void create_csv_simple_op() {
     extract_column_and_add_to(extracted_data, dima_o1_csv, "Simple Ops", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_csv, "Simple Ops", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_o1_csv, "Simple Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_csv, "Simple Ops", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_o1_csv, "Simple Ops", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_csv, "Simple Ops", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_o1_csv, "Simple Ops", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_csv, "Simple Ops", "Unique");
@@ -467,6 +489,8 @@ void create_csv_simple_op_medium() {
     extract_column_and_add_to(extracted_data, dima_medium_o1_csv, "Simple Ops", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_csv, "Simple Ops", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_o1_csv, "Simple Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_medium_csv, "Simple Ops", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_medium_o1_csv, "Simple Ops", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Simple Ops", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_medium_o1_csv, "Simple Ops", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_medium_csv, "Simple Ops", "Unique");
@@ -493,6 +517,8 @@ void create_csv_complex_op() {
     extract_column_and_add_to(extracted_data, dima_o1_csv, "Complex Ops", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_csv, "Complex Ops", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_o1_csv, "Complex Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_csv, "Complex Ops", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_o1_csv, "Complex Ops", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_csv, "Complex Ops", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_o1_csv, "Complex Ops", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_csv, "Complex Ops", "Unique");
@@ -519,6 +545,8 @@ void create_csv_complex_op_medium() {
     extract_column_and_add_to(extracted_data, dima_medium_o1_csv, "Complex Ops", "Dima-O1");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_csv, "Complex Ops", "Dima-Reserve");
     extract_column_and_add_to(extracted_data, dima_reserve_medium_o1_csv, "Complex Ops", "Dima-Reserve-O1");
+    extract_column_and_add_to(extracted_data, dima_array_medium_csv, "Complex Ops", "Dima-Array");
+    extract_column_and_add_to(extracted_data, dima_array_medium_o1_csv, "Complex Ops", "Dima-Array-O1");
     extract_column_and_add_to(extracted_data, std_shared_medium_csv, "Complex Ops", "Shared");
     extract_column_and_add_to(extracted_data, std_shared_medium_o1_csv, "Complex Ops", "Shared-O1");
     extract_column_and_add_to(extracted_data, std_unique_medium_csv, "Complex Ops", "Unique");
