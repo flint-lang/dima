@@ -68,7 +68,7 @@ if [ "$1" != "skip_cpp" ]; then
     echo "-- Building 'dima-array'..."
     build_cpp dima_array.cpp dima-array
     echo "-- Building 'dima-array-medium'..."
-    build_cpp dima_array.cpp dima-array-medium -DIMA_RESERVE
+    build_cpp dima_array.cpp dima-array-medium -DMEDIUM_TEST
 
     echo "-- Building 'std-shared'..."
     build_cpp std_shared.cpp std-shared
