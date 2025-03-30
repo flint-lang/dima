@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+start_time="$(date +%s)"
+
 rm -r ./out/*
 
 echo "-- Building the executables..."
@@ -54,3 +56,10 @@ benchmark c malloc-medium-c
 benchmark c malloc-medium-c-o1
 
 ./scripts/generate_graphs.sh
+
+end_time="$(date +%s)"
+time_diff="$((end_time - start_time))"
+time_diff_minutes="$((time_diff / 60))"
+time_diff_seconds="$((time_diff % 60))"
+
+echo "-- Benchmarking took ${time_diff_minutes}:${time_diff_seconds} minutes"
