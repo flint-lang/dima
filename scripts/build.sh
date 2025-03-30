@@ -65,6 +65,10 @@ if [ "$1" != "skip_cpp" ]; then
     build_cpp dima.cpp dima-reserve -DDIMA_RESERVE
     echo "-- Building 'dima-reserve-medium'..."
     build_cpp dima.cpp dima-reserve-medium -DIMA_RESERVE -DMEDIUM_TEST
+    echo "-- Building 'dima-array'..."
+    build_cpp dima_array.cpp dima-array
+    echo "-- Building 'dima-array-medium'..."
+    build_cpp dima_array.cpp dima-array-medium -DIMA_RESERVE
 
     echo "-- Building 'std-shared'..."
     build_cpp std_shared.cpp std-shared
@@ -83,6 +87,10 @@ if [ "$1" != "skip_cpp" ]; then
     build_cpp dima.cpp dima-reserve-o1 -DDIMA_RESERVE -O1
     echo "-- Building 'dima-reserve-medium-o1'..."
     build_cpp dima.cpp dima-reserve-medium-o1 -DDIMA_RESERVE -DMEDIUM_TEST -O1
+    echo "-- Building 'dima-array-o1'..."
+    build_cpp dima_array.cpp dima-array-o1 -O1
+    echo "-- Building 'dima-array-medium-o1'..."
+    build_cpp dima_array.cpp dima-array-medium-o1 -DMEDIUM_TEST -O1
 
     echo "-- Building 'std-shared-o1'..."
     build_cpp std_shared.cpp std-shared-o1 -O1

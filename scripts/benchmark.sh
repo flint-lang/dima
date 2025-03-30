@@ -13,7 +13,6 @@ benchmark() {
     time ./out/"$1"/"$2" | tee ./test/results/test_outputs/"$1/$2".txt
 }
 
-
 mkdir -p ./test/results/test_outputs
 mkdir -p ./test/results/test_outputs/cpp
 mkdir -p ./test/results/test_outputs/c
@@ -27,6 +26,10 @@ if [ "$1" != "skip_cpp" ]; then
     benchmark cpp dima-reserve-o1
     benchmark cpp dima-reserve-medium
     benchmark cpp dima-reserve-medium-o1
+    benchmark cpp dima-array
+    benchmark cpp dima-array-o1
+    benchmark cpp dima-array-medium
+    benchmark cpp dima-array-medium-o1
     benchmark cpp std-shared
     benchmark cpp std-shared-o1
     benchmark cpp std-shared-medium
