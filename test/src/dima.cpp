@@ -8,9 +8,15 @@
 
 #include <dima/type.hpp>
 
+#if defined(MEDIUM_TEST)
+#define VALUES_LEN 8
+#else
+#define VALUES_LEN 64
+#endif
+
 class Expression : public dima::Type<Expression> {
   public:
-    std::array<double, 64> values; // 512 Bytes of data
+    std::array<double, VALUES_LEN> values; // 512 / 64 Bytes of data
 
     Expression() = default;
     explicit Expression(const std::string &type) :
@@ -62,7 +68,9 @@ std::tuple<duration, duration, duration, duration, size_t, size_t, size_t> test_
     {
         // Create multiple expressions
         std::vector<dima::Var<Expression>> variables;
+#if defined(DIMA_RESERVE)
         variables.reserve(n);
+#endif
         for (int i = 0; i < n; i++) {
             variables.emplace_back(Expression::allocate(std::string("expr_") + std::to_string(i)));
         }
@@ -115,6 +123,22 @@ int main() {
     all_results.emplace_back(14000000, test_n_allocations(14000000)); // 14.000.000
     all_results.emplace_back(15000000, test_n_allocations(15000000)); // 15.000.000
     all_results.emplace_back(16000000, test_n_allocations(16000000)); // 16.000.000
+#if defined(MEDIUM_TEST)
+    all_results.emplace_back(17000000, test_n_allocations(17000000)); // 17.000.000
+    all_results.emplace_back(18000000, test_n_allocations(18000000)); // 18.000.000
+    all_results.emplace_back(19000000, test_n_allocations(19000000)); // 19.000.000
+    all_results.emplace_back(20000000, test_n_allocations(20000000)); // 20.000.000
+    all_results.emplace_back(21000000, test_n_allocations(21000000)); // 21.000.000
+    all_results.emplace_back(22000000, test_n_allocations(22000000)); // 22.000.000
+    all_results.emplace_back(23000000, test_n_allocations(23000000)); // 23.000.000
+    all_results.emplace_back(24000000, test_n_allocations(24000000)); // 24.000.000
+    all_results.emplace_back(25000000, test_n_allocations(25000000)); // 25.000.000
+    all_results.emplace_back(26000000, test_n_allocations(26000000)); // 26.000.000
+    all_results.emplace_back(27000000, test_n_allocations(27000000)); // 27.000.000
+    all_results.emplace_back(28000000, test_n_allocations(28000000)); // 28.000.000
+    all_results.emplace_back(29000000, test_n_allocations(29000000)); // 29.000.000
+    all_results.emplace_back(30000000, test_n_allocations(30000000)); // 30.000.000
+#endif
 
     // Print formatted results
     print_results_table(all_results);

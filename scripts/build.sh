@@ -60,36 +60,36 @@ if [ "$1" != "skip_cpp" ]; then
     echo "-- Building 'dima'..."
     build_cpp dima.cpp dima
     echo "-- Building 'dima-medium'..."
-    build_cpp dima_medium.cpp dima-medium
+    build_cpp dima.cpp dima-medium -DMEDIUM_TEST
     echo "-- Building 'dima-reserve'..."
-    build_cpp dima_reserve.cpp dima-reserve
+    build_cpp dima.cpp dima-reserve -DDIMA_RESERVE
     echo "-- Building 'dima-reserve-medium'..."
-    build_cpp dima_reserve_medium.cpp dima-reserve-medium
+    build_cpp dima.cpp dima-reserve-medium -DIMA_RESERVE -DMEDIUM_TEST
 
     echo "-- Building 'std-shared'..."
     build_cpp std_shared.cpp std-shared
     echo "-- Building 'std-shared-medium'..."
-    build_cpp std_shared_medium.cpp std-shared-medium
+    build_cpp std_shared.cpp std-shared-medium -DMEDIUM_TEST
     echo "-- Building 'std-unique'..."
     build_cpp std_unique.cpp std-unique
     echo "-- Building 'std-unique-medium'..."
-    build_cpp std_unique_medium.cpp std-unique-medium
+    build_cpp std_unique.cpp std-unique-medium -DMEDIUM_TEST
 
     echo "-- Building 'dima-o1'..."
     build_cpp dima.cpp dima-o1 -O1
     echo "-- Building 'dima-medium-o1'..."
-    build_cpp dima_medium.cpp dima-medium-o1 -O1
+    build_cpp dima.cpp dima-medium-o1 -DMEDIUM_TEST -O1
     echo "-- Building 'dima-reserve-o1'..."
-    build_cpp dima_reserve.cpp dima-reserve-o1 -O1
+    build_cpp dima.cpp dima-reserve-o1 -DDIMA_RESERVE -O1
     echo "-- Building 'dima-reserve-medium-o1'..."
-    build_cpp dima_reserve_medium.cpp dima-reserve-medium-o1 -O1
+    build_cpp dima.cpp dima-reserve-medium-o1 -DDIMA_RESERVE -DMEDIUM_TEST -O1
 
     echo "-- Building 'std-shared-o1'..."
     build_cpp std_shared.cpp std-shared-o1 -O1
     echo "-- Building 'std-shared-medium-o1'..."
-    build_cpp std_shared_medium.cpp std-shared-medium-o1 -O1
+    build_cpp std_shared.cpp std-shared-medium-o1 -DMEDIUM_TEST -O1
     echo "-- Building 'std-unique-o1'..."
     build_cpp std_unique.cpp std-unique-o1 -O1
     echo "-- Building 'std-unique-medium-o1'..."
-    build_cpp std_unique_medium.cpp std-unique-medium-o1 -O1
+    build_cpp std_unique.cpp std-unique-medium-o1 -DMEDIUM_TEST -O1
 fi
