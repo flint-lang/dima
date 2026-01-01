@@ -8,21 +8,20 @@
 
 #define DIMA_IMPLEMENTATION
 #include <dima-c/dima.h>
-// #define LIKELYHOOD_TESTING
 
-#if defined(MEDIUM_TEST)
+#ifdef MEDIUM_TEST
 #define VALUES_LEN 8
 #else
 #define VALUES_LEN 64
 #endif
 
-typedef struct {
+typedef struct Expression {
     int x, y;
     float h;
     double values[VALUES_LEN];
 } Expression;
 
-DIMA_DEFINE(Expression, 2, 3, 0.0, {0});
+DIMA_DEFINE(Expression, .x = 2, .y = 3, .h = 0.0, .values = {0});
 
 /// @function `apply_simple_operation_dima`
 /// @brief The simple operation is just the hypothenus of x and y
@@ -110,7 +109,7 @@ Result test_dima(const size_t n) {
     gettimeofday(&complex_ops_end, NULL);
     double memory_usage = (double)get_memory_usage();
     for (size_t i = 0; i < n; i++) {
-        VAR_VALID(Expression, variables[i]);
+        VAR_VALID(variables[i]);
         RELEASE(Expression, variables[i]);
     }
     free(variables);
@@ -259,6 +258,5 @@ int main() {
 #endif
     print_line();
 
-    print_likelyhoods();
     return 0;
 }
