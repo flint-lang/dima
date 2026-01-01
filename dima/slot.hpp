@@ -15,15 +15,23 @@ namespace dima {
     template <typename T, typename = std::enable_if_t<std::is_class_v<T>>> //
     class Slot {
       public:
-        Slot() {
+        Slot() = default;
+        Slot(void *owner_ptr) {
+            // Only overwride the owner if this slot does not have an owner
+            if (this->owner_ptr == nullptr) {
+                this->owner_ptr = owner_ptr;
+            }
             value_ptr = reinterpret_cast<T *>(&value);
         }
 
-        enum SlotFlags {
-            UNUSED = 0,
+        enum SlotFlags : uint8_t {
+            UNUSED = 0, // It's unused when the flags are completely empty
             OCCUPIED = 1,
-            ARRAY_START = 2,
-            ARRAY_MEMBER = 4,
+            OWNED = 2,
+            ARRAY_START = 4,
+            ARRAY_MEMBER = 8,
+            ASYNC = 16,
+            OWNED_BY_ENTITY = 32,
         };
 
         /// @var `flags`
@@ -32,7 +40,14 @@ namespace dima {
 
         /// @var `arc`
         /// @brief The reference counter of this slot, to track how many variables are using this slot
-        std::atomic<size_t> arc = {0};
+        /// @note The ARC is a 24 Bit number in Flint but C++ does not have a 24 bit number natively so we use the next larger number, being
+        /// 32 Bit in size
+        std::atomic<uint32_t> arc = {0};
+
+        /// @var `owner_ptr`
+        /// @brief The pointer to the owner of this slot
+        /// @note A slot can be without an owner, this is intentional and important for the defragmentation process
+        void *owner_ptr = nullptr;
 
         /// @var `value`
         /// @brief The value saved on this slot. As long as the reference count is > 0 this will have a value
@@ -55,7 +70,6 @@ namespace dima {
             new (&value) T(std::forward<Args>(args)...);
             flags |= OCCUPIED;
             arc = 1;
-            // value_ptr = reinterpret_cast<T *>(&value);
         }
 
         /// @function `retain`

@@ -336,3 +336,7 @@ your_type.get_allocation_count()
 ```
 
 This returns a `size_t` value of how many slots are occupied. There also exist the `get_free_count` and `get_capacity` functions on heads to check how many slots are free and how many space for slots there is, both of which return a `size_t` value.
+
+## Internals
+
+Finally you will learn how DIMA actually works under the hood.
