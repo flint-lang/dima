@@ -39,6 +39,7 @@ typedef struct dima_head_t {
 } dima_head_t;
 
 #define DIMA_BASE_CAPACITY 16
+#define DIMA_GROWTH_FACTOR 11
 
 #define container_of(ptr, type, member) (type *)((char *)ptr - offsetof(type, member))
 
@@ -70,6 +71,13 @@ typedef struct dima_head_t {
             RELEASE(T, *ptr);                                                                                                              \
         }                                                                                                                                  \
     }
+
+/// @function `dima_get_block_capacity`
+/// @brief Calculates the block capacity of the given index of the block
+///
+/// @param `index` The index of the block to get the capacity from
+/// @return `size_t` The capacity of the block at the given index
+size_t dima_get_block_capacity(const size_t index);
 
 /// @function `dima_init_head`
 /// @brief Initializes the head with the given value size
@@ -149,6 +157,16 @@ bool dima_is_valid(const void *value);
 
 #ifdef DIMA_IMPLEMENTATION
 
+size_t dima_get_block_capacity(size_t index) {
+    size_t cap = DIMA_BASE_CAPACITY;
+    for (size_t j = 0; j < index; j++) {
+        // Integer mul/div with ceil rounding to approximate float growth
+        cap = (cap * DIMA_GROWTH_FACTOR + 9) / 10;
+    }
+    // Safety for tiny/zero
+    return cap > 0 ? cap : 1;
+}
+
 dima_head_t *dima_init_head(const void *default_value, const size_t type_size) {
     dima_head_t *new_head = (dima_head_t *)malloc(sizeof(dima_head_t));
     *new_head = (dima_head_t){
@@ -214,7 +232,7 @@ void *dima_allocate(dima_head_t **head_ref) {
             // Check if an a block can be created within the blocks array
             for (size_t i = head->block_count; i > 0; i--) {
                 if (UNLIKELY(head->blocks[i - 1] == NULL)) {
-                    head->blocks[i - 1] = dima_create_block(head->type_size, (size_t)(DIMA_BASE_CAPACITY << (i - 1)));
+                    head->blocks[i - 1] = dima_create_block(head->type_size, dima_get_block_capacity(i - 1));
                     slot_ptr = dima_allocate_in_block(head->blocks[i - 1]);
                     break;
                 }
@@ -224,7 +242,7 @@ void *dima_allocate(dima_head_t **head_ref) {
             // No free slot, allocate new block by reallocating the head
             *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (head->block_count + 1));
             head = *head_ref;
-            head->blocks[head->block_count] = dima_create_block(head->type_size, (size_t)(DIMA_BASE_CAPACITY << head->block_count));
+            head->blocks[head->block_count] = dima_create_block(head->type_size, dima_get_block_capacity(head->block_count));
             head->block_count++;
             // There definitely will be a free slot now
             slot_ptr = dima_allocate_in_block(head->blocks[head->block_count - 1]);
@@ -249,7 +267,7 @@ void dima_reserve(dima_head_t **head_ref, const size_t n) {
     }
     // Start at block index 1
     size_t block_index = 1;
-    while (DIMA_BASE_CAPACITY << block_index < n / 2 + DIMA_BASE_CAPACITY) {
+    while (DIMA_BASE_CAPACITY << block_index < (n * 10) / DIMA_GROWTH_FACTOR + DIMA_BASE_CAPACITY) {
         // Resize the blocks array if bigger blocks are needed
         if (head->block_count == block_index) {
             *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
@@ -266,7 +284,7 @@ void dima_reserve(dima_head_t **head_ref, const size_t n) {
     }
     *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
     head = *head_ref;
-    head->blocks[head->block_count] = dima_create_block(head->type_size, DIMA_BASE_CAPACITY << block_index);
+    head->blocks[head->block_count] = dima_create_block(head->type_size, dima_get_block_capacity(block_index));
     head->block_count++;
 }
 
@@ -274,7 +292,7 @@ size_t dima_get_active_capacity(const dima_head_t *head) {
     size_t capacity = 0;
     for (size_t i = 0; i < head->block_count; i++) {
         if (head->blocks[i] != NULL) {
-            capacity += DIMA_BASE_CAPACITY << i;
+            capacity += dima_get_block_capacity(i);
         }
     }
     return capacity;
