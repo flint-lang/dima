@@ -163,8 +163,7 @@ size_t dima_get_block_capacity(size_t index) {
         // Integer mul/div with ceil rounding to approximate float growth
         cap = (cap * DIMA_GROWTH_FACTOR + 9) / 10;
     }
-    // Safety for tiny/zero
-    return cap > 0 ? cap : 1;
+    return cap;
 }
 
 dima_head_t *dima_init_head(const void *default_value, const size_t type_size) {
