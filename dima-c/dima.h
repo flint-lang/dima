@@ -17,8 +17,9 @@ typedef enum : uint8_t {
 } dima_slot_flags_t;
 
 typedef struct dima_slot_t {
-    dima_slot_flags_t flags;
+    uint32_t block_id;
     uint32_t arc;
+    dima_slot_flags_t flags;
     char value[];
 } dima_slot_t;
 
@@ -32,8 +33,8 @@ typedef struct dima_block_t {
 } dima_block_t;
 
 typedef struct dima_head_t {
-    size_t type_size;
     const void *default_value;
+    size_t type_size;
     size_t block_count;
     dima_block_t *blocks[];
 } dima_head_t;
@@ -169,8 +170,8 @@ size_t dima_get_block_capacity(size_t index) {
 dima_head_t *dima_init_head(const void *default_value, const size_t type_size) {
     dima_head_t *new_head = (dima_head_t *)malloc(sizeof(dima_head_t));
     *new_head = (dima_head_t){
-        .type_size = type_size,
         .default_value = default_value,
+        .type_size = type_size,
         .block_count = 0,
     };
     return new_head;
@@ -213,6 +214,7 @@ void *dima_allocate(dima_head_t **head_ref) {
         head->block_count = 1;
         head->blocks[0] = dima_create_block(head->type_size, DIMA_BASE_CAPACITY);
         slot_ptr = dima_allocate_in_block(head->blocks[0]);
+        slot_ptr->block_id = 0;
     } else {
         // Try to find free slot
         for (size_t i = head->block_count; i > 0; i--) {
@@ -225,6 +227,7 @@ void *dima_allocate(dima_head_t **head_ref) {
             }
             // If came here, there definitely is a free slot, so allocation wont fail
             slot_ptr = dima_allocate_in_block(block);
+            slot_ptr->block_id = i - 1;
             break;
         }
         if (UNLIKELY(slot_ptr == NULL)) {
@@ -233,6 +236,7 @@ void *dima_allocate(dima_head_t **head_ref) {
                 if (UNLIKELY(head->blocks[i - 1] == NULL)) {
                     head->blocks[i - 1] = dima_create_block(head->type_size, dima_get_block_capacity(i - 1));
                     slot_ptr = dima_allocate_in_block(head->blocks[i - 1]);
+                    slot_ptr->block_id = i - 1;
                     break;
                 }
             }
@@ -245,6 +249,7 @@ void *dima_allocate(dima_head_t **head_ref) {
             head->block_count++;
             // There definitely will be a free slot now
             slot_ptr = dima_allocate_in_block(head->blocks[head->block_count - 1]);
+            slot_ptr->block_id = head->block_count - 1;
         }
     }
     // Copy the default value into the slot
@@ -324,46 +329,41 @@ void dima_release(dima_head_t **head_ref, void *value) {
     }
     // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
     dima_head_t *head = *head_ref;
+    const size_t block_id = slot->block_id;
+    dima_block_t *block = head->blocks[block_id];
+    // This is the block containing the freed slot
+    assert(block->used > 0);
+    block->used--;
+    // Fill the slot with zeroes
     const size_t slot_size = sizeof(dima_slot_t) + head->type_size;
-    for (size_t i = head->block_count; i > 0; i--) {
-        if (UNLIKELY(head->blocks[i - 1] == NULL)) {
-            continue;
-        }
-        dima_block_t *block = head->blocks[i - 1];
-        char *start = (char *)block->slots;
-        char *end = start + (block->capacity * slot_size);
-        if (UNLIKELY((char *)value >= start && (char *)value < end)) {
-            // This is the block containing the freed slot
-            assert(block->used > 0);
-            block->used--;
-            // Fill the slot with zeroes
-            memset(slot, 0, slot_size);
-            size_t index = ((char *)slot - start) / slot_size;
-            if (block->first_free_slot_id > index) {
-                block->first_free_slot_id = index;
-            }
-            if (UNLIKELY(block->used == 0)) {
-                // Remove empty block
-                free(block);
-                head->blocks[i - 1] = NULL;
-                // Shrink the blocks array if the last block was freed up to the first block thats not null
-                if (UNLIKELY(i == head->block_count)) {
-                    // Check how many empty blocks there are to calculate the new size
-                    size_t new_size = head->block_count - 1;
-                    for (; new_size > 0; new_size--) {
-                        if (head->blocks[new_size - 1] != NULL) {
-                            break;
-                        }
-                    }
-                    // Realloc the head to the new size
-                    head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (new_size));
-                    *head_ref = head;
-                    head->block_count = new_size;
-                }
-            }
-            return;
+    memset(slot, 0, slot_size);
+    char *start = (char *)block->slots;
+    size_t index = ((char *)slot - start) / slot_size;
+    if (block->first_free_slot_id > index) {
+        block->first_free_slot_id = index;
+    }
+    if (LIKELY(block->used > 0)) {
+        return;
+    }
+    // Remove empty block
+    free(block);
+    head->blocks[block_id] = NULL;
+    // Shrink the blocks array if the last block was freed up to the first block thats not null
+    if (LIKELY(block_id + 1 < head->block_count)) {
+        return;
+    }
+
+    // Check how many empty blocks there are to calculate the new size
+    size_t new_size = head->block_count - 1;
+    for (; new_size > 0; new_size--) {
+        if (head->blocks[new_size - 1] != NULL) {
+            break;
         }
     }
+    // Realloc the head to the new size
+    head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (new_size));
+    *head_ref = head;
+    head->block_count = new_size;
 }
 
 bool dima_is_valid(const void *value) {
