@@ -207,7 +207,7 @@ dima_slot_t *dima_allocate_in_block(dima_block_t *block) {
 void *dima_allocate(dima_head_t **head_ref) {
     dima_head_t *head = *head_ref;
     dima_slot_t *slot_ptr = NULL;
-    if (UNLIKELY(head->blocks == NULL)) {
+    if (UNLIKELY(head->block_count == 0)) {
         // Create the first block
         head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *));
         *head_ref = head;
