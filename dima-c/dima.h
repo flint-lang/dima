@@ -208,8 +208,8 @@ void *dima_allocate(dima_head_t **head_ref) {
     dima_slot_t *slot_ptr = NULL;
     if (UNLIKELY(head->blocks == NULL)) {
         // Create the first block
-        *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *));
-        head = *head_ref;
+        head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *));
+        *head_ref = head;
         head->block_count = 1;
         head->blocks[0] = dima_create_block(head->type_size, DIMA_BASE_CAPACITY);
         slot_ptr = dima_allocate_in_block(head->blocks[0]);
@@ -239,8 +239,8 @@ void *dima_allocate(dima_head_t **head_ref) {
         }
         if (UNLIKELY(slot_ptr == NULL)) {
             // No free slot, allocate new block by reallocating the head
-            *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (head->block_count + 1));
-            head = *head_ref;
+            head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (head->block_count + 1));
+            *head_ref = head;
             head->blocks[head->block_count] = dima_create_block(head->type_size, dima_get_block_capacity(head->block_count));
             head->block_count++;
             // There definitely will be a free slot now
@@ -259,8 +259,8 @@ void dima_reserve(dima_head_t **head_ref, const size_t n) {
     }
     // We need at least one block, so lets create it
     if (UNLIKELY(head->block_count == 0)) {
-        *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *));
-        head = *head_ref;
+        head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *));
+        *head_ref = head;
         head->blocks[0] = NULL;
         head->block_count = 1;
     }
@@ -269,8 +269,8 @@ void dima_reserve(dima_head_t **head_ref, const size_t n) {
     while (DIMA_BASE_CAPACITY << block_index < (n * 10) / DIMA_GROWTH_FACTOR + DIMA_BASE_CAPACITY) {
         // Resize the blocks array if bigger blocks are needed
         if (head->block_count == block_index) {
-            *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
-            head = *head_ref;
+            head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
+            *head_ref = head;
             head->blocks[block_index] = NULL;
             head->block_count++;
         }
@@ -281,8 +281,8 @@ void dima_reserve(dima_head_t **head_ref, const size_t n) {
         // Dont do anything, as the head already has enough space for what we need
         return;
     }
-    *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
-    head = *head_ref;
+    head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
+    *head_ref = head;
     head->blocks[head->block_count] = dima_create_block(head->type_size, dima_get_block_capacity(block_index));
     head->block_count++;
 }
@@ -356,8 +356,8 @@ void dima_release(dima_head_t **head_ref, void *value) {
                         }
                     }
                     // Realloc the head to the new size
-                    *head_ref = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (new_size));
-                    head = *head_ref;
+                    head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (new_size));
+                    *head_ref = head;
                     head->block_count = new_size;
                 }
             }
