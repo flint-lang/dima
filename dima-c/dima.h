@@ -197,7 +197,7 @@ dima_slot_t *dima_allocate_in_block(dima_block_t *block) {
             slot->flags = DIMA_OCCUPIED;
             slot->arc = 1;
             block->used++;
-            block->first_free_slot_id = i + 1;
+            block->first_free_slot_id = i + 1 >= block->capacity ? 0 : i + 1;
             return slot;
         }
     }
