@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum : uint8_t {
+typedef enum : uint16_t {
     DIMA_UNUSED = 0,
     DIMA_OCCUPIED = 1,
     DIMA_ARRAY_START = 2,
@@ -17,8 +17,9 @@ typedef enum : uint8_t {
 } dima_slot_flags_t;
 
 typedef struct dima_slot_t {
-    uint32_t block_id;
+    void *owner;
     uint32_t arc;
+    uint16_t block_id;
     dima_slot_flags_t flags;
     char value[];
 } dima_slot_t;
@@ -327,11 +328,10 @@ void dima_release(dima_head_t **head_ref, void *value) {
         // Do not apply all the below checks since no block is potentially freed
         return;
     }
-    // Start at the biggest block because it has the most slots, so it is the most likely to contain the slot
+    // Release the slot within the block it is in
     dima_head_t *head = *head_ref;
     const size_t block_id = slot->block_id;
     dima_block_t *block = head->blocks[block_id];
-    // This is the block containing the freed slot
     assert(block->used > 0);
     block->used--;
     // Fill the slot with zeroes
