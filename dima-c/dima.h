@@ -9,12 +9,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum : uint16_t {
+enum {
     DIMA_UNUSED = 0,
     DIMA_OCCUPIED = 1,
     DIMA_ARRAY_START = 2,
     DIMA_ARRAY_MEMBER = 4,
-} dima_slot_flags_t;
+};
+typedef uint8_t dima_slot_flags_t;
 
 typedef struct dima_slot_t {
     void *owner;
