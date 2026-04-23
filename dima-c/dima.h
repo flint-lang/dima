@@ -271,27 +271,24 @@ void dima_reserve(dima_head_t **head_ref, const size_t n) {
         head->blocks[0] = NULL;
         head->block_count = 1;
     }
-    // Start at block index 1
-    size_t block_index = 1;
-    while (DIMA_BASE_CAPACITY << block_index < (n * 10) / DIMA_GROWTH_FACTOR + DIMA_BASE_CAPACITY) {
-        // Resize the blocks array if bigger blocks are needed
-        if (head->block_count == block_index) {
-            head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
-            *head_ref = head;
-            head->blocks[block_index] = NULL;
-            head->block_count++;
-        }
+    // Calculate how many blocks we need to reserve capacity for n items
+    size_t total_capacity = 0;
+    size_t block_index = 0;
+    while (total_capacity < n) {
+        total_capacity += dima_get_block_capacity(block_index);
         block_index++;
     }
-    // TODO: Potentially dead code, needs testing
-    if (head->block_count >= block_index) {
-        // Dont do anything, as the head already has enough space for what we need
-        return;
+
+    // Resize the blocks array if we need blocks than we have
+    if (head->block_count < block_index) {
+        head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * block_index);
+        *head_ref = head;
+        // Initialize any new block pointers to NULL
+        for (size_t i = head->block_count; i < block_index; i++) {
+            head->blocks[i] = NULL;
+        }
+        head->block_count = block_index;
     }
-    head = (dima_head_t *)realloc(head, sizeof(dima_head_t) + sizeof(dima_block_t *) * (block_index + 1));
-    *head_ref = head;
-    head->blocks[head->block_count] = dima_create_block(head->type_size, dima_get_block_capacity(block_index));
-    head->block_count++;
 }
 
 size_t dima_get_active_capacity(const dima_head_t *head) {
