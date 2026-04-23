@@ -24,7 +24,7 @@ namespace dima {
             block_id(block_id),
             capacity(n),
             slots(n) {
-            free_slots.resize(n / BASE_SIZE);
+            free_slots.resize((n + BASE_SIZE - 1) / BASE_SIZE);
             for (auto &slot : slots) {
                 slot.on_free_callback = [this](Slot<T> *freed_slot) { this->slot_freed(freed_slot); };
             }

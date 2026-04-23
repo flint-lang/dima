@@ -12,6 +12,24 @@
 /// @namespace `dima`
 /// @brief The `dima` namespace contains all classes used for the DIMA memory management system
 namespace dima {
+    static constexpr size_t BASE_CAPACITY = 16;
+    static constexpr size_t GROWTH_FACTOR = 11;
+
+    /// @function `get_block_capacity`
+    /// @brief Calculates the block capacity of the given index of the block
+    /// This function mirrors the C library's dima_get_block_capacity function
+    ///
+    /// @param `index` The index of the block to get the capacity from
+    /// @return `size_t` The capacity of the block at the given index
+    inline size_t get_block_capacity(const size_t index) {
+        size_t cap = BASE_CAPACITY;
+        for (size_t j = 0; j < index; j++) {
+            // Integer mul/div with ceil rounding to approximate float growth
+            // This approximates a 1.1x growth factor (GROWTH_FACTOR = 11 means 11/10 = 1.1)
+            cap = (cap * GROWTH_FACTOR + 9) / 10;
+        }
+        return cap;
+    }
 
     /// @class `Head`
     /// @brief The head structure managing all allocated blocks, with incremental growth
@@ -45,15 +63,14 @@ namespace dima {
                 if (blocks[i - 1] != nullptr) {
                     continue;
                 }
-                blocks[i - 1] = std::make_unique<Block<T>>(i - 1, BASE_SIZE << (i - 1));
+                blocks[i - 1] = std::make_unique<Block<T>>(i - 1, get_block_capacity(i - 1));
                 blocks[i - 1]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
                 return blocks[i - 1]->allocate(std::forward<Args>(args)...).value();
             }
 
-            // If all blocks are full, create a new block with 2x size of the last one, a new block definitely has space for a new variable
+            // If all blocks are full, create a new block with the calculated size, a new block definitely has space for a new variable
             const size_t block_id = blocks.size();
-            const size_t new_size = blocks.empty() ? BASE_SIZE : (BASE_SIZE << block_id);
-            blocks.emplace_back(std::make_unique<Block<T>>(block_id, new_size));
+            blocks.emplace_back(std::make_unique<Block<T>>(block_id, get_block_capacity(block_id)));
             blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
             // The now allocated slot should **always** have a value
             return blocks.back()->allocate(std::forward<Args>(args)...).value();
@@ -83,33 +100,43 @@ namespace dima {
             // Apply the block mutex, as now definitely a new block will be added one way or the other
             std::lock_guard<std::mutex> lock(blocks_mutex);
 
-            // Try to cerate a block that isnt created yet in the current blocks vector
+            // Calculate how many blocks we need to ensure we have one large enough
+            // Note: allocate_array requires length + 2 slots for padding on both ends
+            size_t required_capacity = length + 2;
+            size_t required_block_index = blocks.size();
+            while (get_block_capacity(required_block_index) < required_capacity) {
+                required_block_index++;
+            }
+
+            // Expand blocks vector to have enough slots for the required block
+            while (blocks.size() <= required_block_index) {
+                blocks.push_back(nullptr);
+            }
+
+            // Try to create a block that isn't created yet in the current blocks vector
             for (size_t i = blocks.size(); i > 0; i--) {
                 if (blocks[i - 1] != nullptr) {
                     continue;
                 }
-                const size_t block_capacity = BASE_SIZE << (i - 1);
-                if (block_capacity < length) {
-                    // Only smaller blocks will follow, so we need a bigger block than this
-                    break;
+                const size_t block_capacity = get_block_capacity(i - 1);
+                if (block_capacity >= length) {
+                    // This block can fit the array, create it and allocate
+                    blocks[i - 1] = std::make_unique<Block<T>>(i - 1, block_capacity);
+                    blocks[i - 1]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+                    auto arr = blocks[i - 1]->allocate_array(length, std::forward<Args>(args)...);
+                    if (arr.has_value()) {
+                        return arr.value();
+                    }
                 }
-                // Otherwise we can create a new block, that one should fit the array
-                blocks[i - 1] = std::make_unique<Block<T>>(i - 1, BASE_SIZE << (i - 1));
-                blocks[i - 1]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
-                return blocks[i - 1]->allocate_array(length, std::forward<Args>(args)...).value();
             }
 
-            // If all blocks are full, create a new block that has enough space for the array
-            size_t block_id = blocks.size();
-            while (BASE_SIZE << block_id < length) {
-                blocks.push_back(nullptr);
-                block_id++;
+            // This should never be reached, but as safety, use the calculated required index
+            const size_t block_id = required_block_index;
+            if (blocks[block_id] == nullptr) {
+                blocks[block_id] = std::make_unique<Block<T>>(block_id, get_block_capacity(block_id));
+                blocks[block_id]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
             }
-            const size_t new_size = BASE_SIZE << block_id;
-            blocks.emplace_back(std::make_unique<Block<T>>(block_id, new_size));
-            blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
-            // The now allocated array should **always** have a value
-            return blocks.back()->allocate_array(length, std::forward<Args>(args)...).value();
+            return blocks[block_id]->allocate_array(length, std::forward<Args>(args)...).value();
         }
 
         /// @function `reserve`
@@ -121,16 +148,24 @@ namespace dima {
         /// @param `n` The number of objects to reserve
         void reserve(const size_t n) {
             std::lock_guard<std::mutex> lock(blocks_mutex);
+            // Calculate how many blocks we need to reserve capacity for n items
+            size_t total_capacity = 0;
             size_t block_index = 0;
-            while (BASE_SIZE << block_index < n / 2 + BASE_SIZE) {
-                if (blocks.size() == block_index) {
-                    // Create empty blocks in the blocks vector which do not point to any real block
-                    blocks.push_back(nullptr);
-                }
+            while (total_capacity < n) {
+                total_capacity += get_block_capacity(block_index);
                 block_index++;
             }
-            blocks.emplace_back(std::make_unique<Block<T>>(block_index, BASE_SIZE << block_index));
-            blocks.back()->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+
+            // Ensure we have enough blocks in the vector
+            while (blocks.size() < block_index) {
+                blocks.push_back(nullptr);
+            }
+
+            // Create the final block if it doesn't exist
+            if (blocks[block_index - 1] == nullptr) {
+                blocks[block_index - 1] = std::make_unique<Block<T>>(block_index - 1, get_block_capacity(block_index - 1));
+                blocks[block_index - 1]->set_empty_callback([this](Block<T> *empty_block) { this->block_emptied(empty_block); });
+            }
         }
 
       private:
