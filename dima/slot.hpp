@@ -15,13 +15,14 @@ namespace dima {
     template <typename T, typename = std::enable_if_t<std::is_class_v<T>>> //
     class Slot {
       public:
-        Slot() = default;
-        Slot(void *owner_ptr) {
+        Slot() :
+            value_ptr(reinterpret_cast<T *>(&value)) {}
+        Slot(void *owner_ptr) :
+            value_ptr(value_ptr = reinterpret_cast<T *>(&value)) {
             // Only overwride the owner if this slot does not have an owner
             if (this->owner_ptr == nullptr) {
                 this->owner_ptr = owner_ptr;
             }
-            value_ptr = reinterpret_cast<T *>(&value);
         }
 
         enum SlotFlags : uint8_t {
